@@ -32,7 +32,7 @@
         </div>
 
         <div class="nav-item">
-            <a href="#" class="nav-link disabled">
+            <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
                 <i class="bi bi-cart-fill"></i> Orders
             </a>
         </div>

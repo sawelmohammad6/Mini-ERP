@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -33,5 +34,6 @@ Route::middleware(['auth','admin'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('customers', CustomerController::class)->except(['show']);
     Route::resource('products', ProductController::class)->except(['show']);
+    Route::resource('orders', OrderController::class)->except(['show']);
 });
 require __DIR__.'/auth.php';
