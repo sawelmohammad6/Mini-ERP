@@ -17,6 +17,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th>Order ID</th>
+                        <th>Product</th>
                         <th>Customer</th>
                         <th>Total</th>
                         <th>Discount</th>
@@ -27,8 +28,24 @@
                 </thead>
                 <tbody>
                     @forelse ($orders as $order)
+                        @php $item = $order->items->first(); @endphp
                         <tr>
                             <td class="fw-medium" style="color: #1a1a2e;">#{{ $order->id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if ($item && $item->product && $item->product->image)
+                                        <img src="{{ Storage::url($item->product->image) }}"
+                                            alt="{{ $item->product->name }}"
+                                            style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                    @else
+                                        <div class="d-flex align-items-center justify-content-center bg-light"
+                                            style="width: 40px; height: 40px; border-radius: 4px;">
+                                            <i class="bi bi-image text-muted" style="font-size: 1rem;"></i>
+                                        </div>
+                                    @endif
+                                    <span style="color: #1a1a2e;">{{ $item->product->name ?? '—' }}</span>
+                                </div>
+                            </td>
                             <td style="color: #5a6270;">{{ $order->customer->name }}</td>
                             <td style="color: #5a6270;">${{ number_format($order->total, 2) }}</td>
                             <td style="color: #5a6270;">${{ number_format($order->discount, 2) }}</td>
@@ -46,7 +63,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">No orders found.</td>
+                            <td colspan="8" class="text-center text-muted py-4">No orders found.</td>
                         </tr>
                     @endforelse
                 </tbody>

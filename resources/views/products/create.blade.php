@@ -4,7 +4,7 @@
     </div>
 
     <div class="panel bg-white shadow-sm p-4">
-        <form action="{{ route('products.store') }}" method="POST">
+        <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="mb-3">
@@ -21,6 +21,15 @@
                 <input type="number" step="0.01" min="0" class="form-control @error('price') is-invalid @enderror"
                     id="price" name="price" value="{{ old('price') }}" required>
                 @error('price')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Product Image</label>
+                <input type="file" class="form-control @error('image') is-invalid @enderror"
+                    id="image" name="image" accept="image/jpg,image/jpeg,image/png,image/webp">
+                @error('image')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>

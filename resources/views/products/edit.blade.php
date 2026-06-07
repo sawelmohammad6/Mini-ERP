@@ -4,7 +4,7 @@
     </div>
 
     <div class="panel bg-white shadow-sm p-4">
-        <form action="{{ route('products.update', $product) }}" method="POST">
+        <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -22,6 +22,30 @@
                 <input type="number" step="0.01" min="0" class="form-control @error('price') is-invalid @enderror"
                     id="price" name="price" value="{{ old('price', $product->price) }}" required>
                 @error('price')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Current Image</label>
+                <div>
+                    @if ($product->image)
+                        <img src="{{ Storage::url($product->image) }}"
+                            alt="{{ $product->name }}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 6px;">
+                    @else
+                        <div class="d-flex align-items-center justify-content-center bg-light"
+                            style="width: 120px; height: 120px; border-radius: 6px;">
+                            <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Replace Image</label>
+                <input type="file" class="form-control @error('image') is-invalid @enderror"
+                    id="image" name="image" accept="image/jpg,image/jpeg,image/png,image/webp">
+                @error('image')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>

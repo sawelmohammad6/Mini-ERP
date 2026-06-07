@@ -29,7 +29,9 @@
                     id="product_id" name="product_id" required>
                     <option value="">-- Select Product --</option>
                     @foreach ($products as $product)
-                        <option value="{{ $product->id }}" data-price="{{ $product->price }}"
+                        <option value="{{ $product->id }}"
+                            data-price="{{ $product->price }}"
+                            data-image="{{ $product->image ? Storage::url($product->image) : '' }}"
                             {{ old('product_id') == $product->id ? 'selected' : '' }}>
                             {{ $product->name }} — ${{ number_format($product->price, 2) }}
                         </option>
@@ -40,33 +42,44 @@
                 @enderror
             </div>
 
-            <div class="mb-3">
-                <label for="price" class="form-label">Price</label>
-                <input type="text" class="form-control" id="price" readonly
-                    value="{{ old('product_id') ? '$' . number_format($products->firstWhere('id', old('product_id'))?->price ?? 0, 2) : '' }}">
-            </div>
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <div id="productImagePreview"
+                        class="d-flex align-items-center justify-content-center bg-light"
+                        style="width: 100px; height: 100px; border-radius: 6px;">
+                        <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        <input type="text" class="form-control" id="price" readonly
+                            value="{{ old('product_id') ? '$' . number_format($products->firstWhere('id', old('product_id'))?->price ?? 0, 2) : '' }}">
+                    </div>
 
-            <div class="mb-3">
-                <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
-                <input type="number" class="form-control @error('quantity') is-invalid @enderror"
-                    id="quantity" name="quantity" value="{{ old('quantity', 1) }}" min="1" required>
-                @error('quantity')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control @error('quantity') is-invalid @enderror"
+                            id="quantity" name="quantity" value="{{ old('quantity', 1) }}" min="1" required>
+                        @error('quantity')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-            <div class="mb-3">
-                <label for="discount" class="form-label">Discount ($)</label>
-                <input type="number" class="form-control @error('discount') is-invalid @enderror"
-                    id="discount" name="discount" value="{{ old('discount', 0) }}" min="0" step="0.01">
-                @error('discount')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
+                    <div class="mb-3">
+                        <label for="discount" class="form-label">Discount ($)</label>
+                        <input type="number" class="form-control @error('discount') is-invalid @enderror"
+                            id="discount" name="discount" value="{{ old('discount', 0) }}" min="0" step="0.01">
+                        @error('discount')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-            <div class="mb-3">
-                <label for="subtotal" class="form-label">Subtotal</label>
-                <input type="text" class="form-control" id="subtotal" readonly value="$0.00">
+                    <div class="mb-3">
+                        <label for="subtotal" class="form-label">Subtotal</label>
+                        <input type="text" class="form-control" id="subtotal" readonly value="$0.00">
+                    </div>
+                </div>
             </div>
 
             <div class="d-flex justify-content-between">
@@ -85,11 +98,30 @@
         const qtyInput = document.getElementById('quantity');
         const discountInput = document.getElementById('discount');
         const subtotalInput = document.getElementById('subtotal');
+        const imagePreview = document.getElementById('productImagePreview');
+
+        function getSelected() {
+            return productSelect.options[productSelect.selectedIndex];
+        }
 
         function getPrice() {
-            const selected = productSelect.options[productSelect.selectedIndex];
+            const selected = getSelected();
             const price = selected ? selected.getAttribute('data-price') : '';
             return price ? parseFloat(price) : 0;
+        }
+
+        function getImage() {
+            const selected = getSelected();
+            return selected ? selected.getAttribute('data-image') || '' : '';
+        }
+
+        function updateImage() {
+            const src = getImage();
+            if (src) {
+                imagePreview.innerHTML = '<img src="' + src + '" alt="Product" style="width:100px;height:100px;object-fit:cover;border-radius:6px;">';
+            } else {
+                imagePreview.innerHTML = '<i class="bi bi-image text-muted" style="font-size: 2rem;"></i>';
+            }
         }
 
         function recalc() {
@@ -101,6 +133,8 @@
 
             const subtotal = price * qty;
             subtotalInput.value = '$' + subtotal.toFixed(2);
+
+            updateImage();
         }
 
         productSelect.addEventListener('change', recalc);

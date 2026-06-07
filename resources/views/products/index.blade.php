@@ -16,6 +16,7 @@
             <table class="table table-striped table-hover align-middle mb-0">
                 <thead class="table-dark">
                     <tr>
+                        <th>Image</th>
                         <th>ID</th>
                         <th>Product Name</th>
                         <th>Price</th>
@@ -26,6 +27,18 @@
                 <tbody>
                     @forelse ($products as $product)
                         <tr>
+                            <td>
+                                @if ($product->image)
+                                    <img src="{{ Storage::url($product->image) }}"
+                                        alt="{{ $product->name }}"
+                                        style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                @else
+                                    <div class="d-flex align-items-center justify-content-center bg-light"
+                                        style="width: 60px; height: 60px; border-radius: 4px;">
+                                        <i class="bi bi-image text-muted" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                @endif
+                            </td>
                             <td>{{ $product->id }}</td>
                             <td class="fw-medium" style="color: #1a1a2e;">{{ $product->name }}</td>
                             <td style="color: #5a6270;">${{ number_format($product->price, 2) }}</td>
@@ -42,7 +55,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">No products found.</td>
+                            <td colspan="6" class="text-center text-muted py-4">No products found.</td>
                         </tr>
                     @endforelse
                 </tbody>
