@@ -34,8 +34,16 @@ class OrderController extends Controller
         ]);
 
         $product  = Product::findOrFail($validated['product_id']);
+       
+       if ($request->quantity > $product->stock_quantity) {
+
+    return back()
+        ->withInput()
+        ->with('error', 'Not enough stock available.');
+}
         $discount = $validated['discount'] ?? 0;
         $subtotal = $product->price * $validated['quantity'];
+      
         $total    = $subtotal;
         $finalPrice = $subtotal - $discount;
 

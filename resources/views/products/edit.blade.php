@@ -25,7 +25,24 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+<div class="mb-3">
+    <label>Stock Quantity</label>
+    <input type="number"
+           name="stock_quantity"
+           class="form-control"
+           min="0"
+           required>
+</div>
 
+<div class="mb-3">
+    <label>Low Stock Alert</label>
+    <input type="number"
+           name="low_stock_alert"
+           class="form-control"
+           min="1"
+           value="5"
+           required>
+</div>
             <div class="mb-3">
                 <label class="form-label">Current Image</label>
                 <div>

@@ -20,6 +20,7 @@
                         <th>ID</th>
                         <th>Product Name</th>
                         <th>Price</th>
+                        <th>Stock</th>
                         <th>Description</th>
                         <th>Actions</th>
                     </tr>
@@ -42,6 +43,15 @@
                             <td>{{ $product->id }}</td>
                             <td class="fw-medium" style="color: #1a1a2e;">{{ $product->name }}</td>
                             <td style="color: #5a6270;">${{ number_format($product->price, 2) }}</td>
+                            <td>
+    {{ $product->stock_quantity }}
+
+    @if($product->stock_quantity <= $product->low_stock_alert)
+        <span class="badge bg-danger ms-1">
+            Low Stock
+        </span>
+    @endif
+</td>
                             <td style="color: #5a6270;">{{ Str::limit($product->description, 50) ?? '—' }}</td>
                             <td>
                                 <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-primary">Edit</a>
@@ -55,7 +65,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">No products found.</td>
+                            <td colspan="7" class="text-center text-muted py-4">No products found.</td>
                         </tr>
                     @endforelse
                 </tbody>
