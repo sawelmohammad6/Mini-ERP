@@ -80,7 +80,26 @@
                     </div>
                 </div>
                 <div class="stat-footer">
-                    <i class="bi bi-dot me-1"></i> Coming soon
+                    <i class="bi bi-check-circle text-success me-1"></i> Orders placed
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="stat-icon" style="background: #fef2f2; color: #ef4444;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Low Stock Products</div>
+                        <div class="stat-value">{{ $stats['lowStockProducts'] }}</div>
+                    </div>
+                </div>
+                <div class="stat-footer">
+                    <i class="bi bi-arrow-down text-danger me-1"></i> Needs attention
                 </div>
             </div>
         </div>

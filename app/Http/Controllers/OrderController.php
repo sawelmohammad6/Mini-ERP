@@ -33,18 +33,17 @@ class OrderController extends Controller
             'discount'    => 'nullable|numeric|min:0',
         ]);
 
-        $product  = Product::findOrFail($validated['product_id']);
-       
-       if ($request->quantity > $product->stock_quantity) {
+        $product = Product::findOrFail($validated['product_id']);
 
-    return back()
-        ->withInput()
-        ->with('error', 'Not enough stock available.');
-}
-        $discount = $validated['discount'] ?? 0;
-        $subtotal = $product->price * $validated['quantity'];
-      
-        $total    = $subtotal;
+        if ($validated['quantity'] > $product->stock_quantity) {
+            return back()
+                ->withInput()
+                ->with('error', 'Not enough stock available.');
+        }
+
+        $discount   = $validated['discount'] ?? 0;
+        $subtotal   = $product->price * $validated['quantity'];
+        $total      = $subtotal;
         $finalPrice = $subtotal - $discount;
 
         $order = Order::create([
@@ -60,6 +59,8 @@ class OrderController extends Controller
             'price'      => $product->price,
             'subtotal'   => $subtotal,
         ]);
+
+        $product->decrement('stock_quantity', $validated['quantity']);
 
         return redirect()
             ->route('orders.index')

@@ -3,6 +3,24 @@
         <h4 class="fw-bold mb-0" style="color: #1a1a2e;">New Order</h4>
     </div>
 
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <div class="panel bg-white shadow-sm p-4">
         <form action="{{ route('orders.store') }}" method="POST">
             @csrf
@@ -32,6 +50,7 @@
                         <option value="{{ $product->id }}"
                             data-price="{{ $product->price }}"
                             data-image="{{ $product->image ? Storage::url($product->image) : '' }}"
+                            data-stock="{{ $product->stock_quantity }}"
                             {{ old('product_id') == $product->id ? 'selected' : '' }}>
                             {{ $product->name }} — ${{ number_format($product->price, 2) }}
                         </option>
@@ -51,10 +70,21 @@
                     </div>
                 </div>
                 <div class="col-md-10">
-                    <div class="mb-3">
-                        <label for="price" class="form-label">Price</label>
-                        <input type="text" class="form-control" id="price" readonly
-                            value="{{ old('product_id') ? '$' . number_format($products->firstWhere('id', old('product_id'))?->price ?? 0, 2) : '' }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Price</label>
+                                <input type="text" class="form-control" id="price" readonly
+                                    value="{{ old('product_id') ? '$' . number_format($products->firstWhere('id', old('product_id'))?->price ?? 0, 2) : '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="stockDisplay" class="form-label">Available Stock</label>
+                                <input type="text" class="form-control" id="stockDisplay" readonly
+                                    value="{{ old('product_id') ? $products->firstWhere('id', old('product_id'))?->stock_quantity ?? '' : '' }}">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -95,6 +125,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const productSelect = document.getElementById('product_id');
         const priceInput = document.getElementById('price');
+        const stockDisplay = document.getElementById('stockDisplay');
         const qtyInput = document.getElementById('quantity');
         const discountInput = document.getElementById('discount');
         const subtotalInput = document.getElementById('subtotal');
@@ -104,19 +135,23 @@
             return productSelect.options[productSelect.selectedIndex];
         }
 
-        function getPrice() {
+        function getAttr(name) {
             const selected = getSelected();
-            const price = selected ? selected.getAttribute('data-price') : '';
-            return price ? parseFloat(price) : 0;
+            return selected ? selected.getAttribute(name) || '' : '';
         }
 
-        function getImage() {
-            const selected = getSelected();
-            return selected ? selected.getAttribute('data-image') || '' : '';
+        function getPrice() {
+            const val = getAttr('data-price');
+            return val ? parseFloat(val) : 0;
+        }
+
+        function getStock() {
+            const val = getAttr('data-stock');
+            return val ? parseInt(val) : 0;
         }
 
         function updateImage() {
-            const src = getImage();
+            const src = getAttr('data-image');
             if (src) {
                 imagePreview.innerHTML = '<img src="' + src + '" alt="Product" style="width:100px;height:100px;object-fit:cover;border-radius:6px;">';
             } else {
@@ -126,10 +161,12 @@
 
         function recalc() {
             const price = getPrice();
+            const stock = getStock();
             const qty = parseInt(qtyInput.value) || 0;
             const discount = parseFloat(discountInput.value) || 0;
 
             priceInput.value = price ? '$' + price.toFixed(2) : '';
+            stockDisplay.value = stock || '';
 
             const subtotal = price * qty;
             subtotalInput.value = '$' + subtotal.toFixed(2);

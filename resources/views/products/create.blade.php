@@ -24,24 +24,25 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-<div class="mb-3">
-    <label>Stock Quantity</label>
-    <input type="number"
-           name="stock_quantity"
-           class="form-control"
-           min="0"
-           required>
-</div>
 
-<div class="mb-3">
-    <label>Low Stock Alert</label>
-    <input type="number"
-           name="low_stock_alert"
-           class="form-control"
-           min="1"
-           value="5"
-           required>
-</div>
+            <div class="mb-3">
+                <label for="stock_quantity" class="form-label">Stock Quantity <span class="text-danger">*</span></label>
+                <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror"
+                    id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', 0) }}" min="0" required>
+                @error('stock_quantity')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="low_stock_alert" class="form-label">Low Stock Alert <span class="text-danger">*</span></label>
+                <input type="number" class="form-control @error('low_stock_alert') is-invalid @enderror"
+                    id="low_stock_alert" name="low_stock_alert" value="{{ old('low_stock_alert', 5) }}" min="1" required>
+                @error('low_stock_alert')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
             <div class="mb-3">
                 <label for="image" class="form-label">Product Image</label>
                 <input type="file" class="form-control @error('image') is-invalid @enderror"
