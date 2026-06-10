@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    {{-- Stats Cards --}}
+    {{-- Stats Row 1 — Business Metrics --}}
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="stat-card bg-white shadow-sm">
@@ -86,7 +86,65 @@
         </div>
     </div>
 
+    {{-- Stats Row 2 — Financial Metrics --}}
     <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="stat-icon" style="background: #e8f5e9; color: #2e7d32;">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Sales</div>
+                        <div class="stat-value" style="font-size: 1.2rem;">${{ number_format($stats['totalSales'], 2) }}</div>
+                    </div>
+                </div>
+                <div class="stat-footer">
+                    <i class="bi bi-cart-check text-success me-1"></i> Revenue generated
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="stat-icon" style="background: #fce4ec; color: #c62828;">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Expenses</div>
+                        <div class="stat-value" style="font-size: 1.2rem;">${{ number_format($stats['totalExpenses'], 2) }}</div>
+                    </div>
+                </div>
+                <div class="stat-footer">
+                    <i class="bi bi-arrow-down text-danger me-1"></i> Costs incurred
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="stat-icon" style="background: #e8f5e9; color: #2e7d32;">
+                        <i class="bi bi-piggy-bank-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Net Profit</div>
+                        <div class="stat-value" style="font-size: 1.2rem; {{ $stats['netProfit'] < 0 ? 'color: #dc3545;' : 'color: #198754;' }}">
+                            ${{ number_format($stats['netProfit'], 2) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-footer">
+                    @if ($stats['netProfit'] >= 0)
+                        <i class="bi bi-arrow-up text-success me-1"></i> Positive
+                    @else
+                        <i class="bi bi-arrow-down text-danger me-1"></i> Negative
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <div class="col-xl-3 col-md-6">
             <div class="stat-card bg-white shadow-sm">
                 <div class="d-flex align-items-center gap-3 mb-3">
@@ -107,28 +165,11 @@
 
     {{-- Charts Section --}}
     <div class="row g-3 mb-4">
-        <div class="col-xl-8">
+        <div class="col-xl-12">
             <div class="panel bg-white shadow-sm p-4">
-                <h6 class="fw-semibold mb-0" style="color: #1a1a2e;">Revenue Overview</h6>
-                <p class="text-muted mb-3" style="font-size: 0.8rem;">Monthly revenue chart placeholder</p>
-                <div class="chart-placeholder">
-                    <div class="text-center">
-                        <i class="bi bi-bar-chart-fill fs-1 d-block mb-2"></i>
-                        <span>Chart will render here</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4">
-            <div class="panel bg-white shadow-sm p-4">
-                <h6 class="fw-semibold mb-0" style="color: #1a1a2e;">Sales by Category</h6>
-                <p class="text-muted mb-3" style="font-size: 0.8rem;">Donut chart placeholder</p>
-                <div class="chart-placeholder">
-                    <div class="text-center">
-                        <i class="bi bi-pie-chart-fill fs-1 d-block mb-2"></i>
-                        <span>Chart will render here</span>
-                    </div>
-                </div>
+                <h6 class="fw-semibold mb-0" style="color: #1a1a2e;">Sales vs Expenses</h6>
+                <p class="text-muted mb-3" style="font-size: 0.8rem;">Monthly comparison for the last 6 months</p>
+                <canvas id="salesExpensesChart" height="100"></canvas>
             </div>
         </div>
     </div>
@@ -208,3 +249,63 @@
         </div>
     </div>
 </x-admin-layout>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('salesExpensesChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @json($chartData['labels']),
+                datasets: [
+                    {
+                        label: 'Sales',
+                        data: @json($chartData['sales']),
+                        backgroundColor: 'rgba(52, 195, 143, 0.7)',
+                        borderColor: '#34c38f',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Expenses',
+                        data: @json($chartData['expenses']),
+                        backgroundColor: 'rgba(244, 106, 106, 0.7)',
+                        borderColor: '#f46a6a',
+                        borderWidth: 2,
+                        borderRadius: 4,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 16,
+                            font: { size: 12 },
+                        },
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) { return '$' + value.toFixed(0); },
+                        },
+                        grid: { color: '#f1f3f5' },
+                    },
+                    x: {
+                        grid: { display: false },
+                    },
+                },
+            },
+        });
+    });
+</script>
+@endpush
