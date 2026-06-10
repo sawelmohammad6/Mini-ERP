@@ -7,6 +7,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ExpenseController;
 Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('dashboard');
@@ -38,5 +39,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('customers', CustomerController::class)->except(['show']);
     Route::resource('products', ProductController::class)->except(['show']);
     Route::resource('orders', OrderController::class)->except(['show']);
+    Route::resource('expenses', ExpenseController::class);
 });
 require __DIR__.'/auth.php';

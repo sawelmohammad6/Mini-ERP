@@ -38,8 +38,8 @@
         </div>
 
         <div class="nav-item">
-            <a href="#" class="nav-link disabled">
-                <i class="bi bi-cash-stack"></i> Expenses
+            <a href="{{ route('expenses.index') }}" class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
+                <i class="bi bi-cash-stack"></i> Expense Management
             </a>
         </div>
 
