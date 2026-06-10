@@ -15,80 +15,9 @@
         </div>
     </div>
 
-    {{-- Stats Row 1 — Business Metrics --}}
+    {{-- Stats Cards --}}
     <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card bg-white shadow-sm">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background: #eef2ff; color: #556ee6;">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <div>
-                        <div class="stat-title">Total Users</div>
-                        <div class="stat-value">{{ $stats['totalUsers'] }}</div>
-                    </div>
-                </div>
-                <div class="stat-footer">
-                    <i class="bi bi-arrow-up text-success me-1"></i> Registered accounts
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card bg-white shadow-sm">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background: #fef2f2; color: #f46a6a;">
-                        <i class="bi bi-person-badge-fill"></i>
-                    </div>
-                    <div>
-                        <div class="stat-title">Total Customers</div>
-                        <div class="stat-value">{{ $stats['totalCustomers'] }}</div>
-                    </div>
-                </div>
-                <div class="stat-footer">
-                    <i class="bi bi-arrow-up text-success me-1"></i> Active clients
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card bg-white shadow-sm">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background: #f0fdf4; color: #34c38f;">
-                        <i class="bi bi-box-seam-fill"></i>
-                    </div>
-                    <div>
-                        <div class="stat-title">Total Products</div>
-                        <div class="stat-value">{{ $stats['totalProducts'] }}</div>
-                    </div>
-                </div>
-                <div class="stat-footer">
-                    <i class="bi bi-arrow-up text-success me-1"></i> In inventory
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card bg-white shadow-sm">
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background: #fefce8; color: #f1b44c;">
-                        <i class="bi bi-cart-fill"></i>
-                    </div>
-                    <div>
-                        <div class="stat-title">Total Orders</div>
-                        <div class="stat-value">{{ $stats['totalOrders'] }}</div>
-                    </div>
-                </div>
-                <div class="stat-footer">
-                    <i class="bi bi-check-circle text-success me-1"></i> Orders placed
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Stats Row 2 — Financial Metrics --}}
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-2 col-md-4">
             <div class="stat-card bg-white shadow-sm">
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <div class="stat-icon" style="background: #e8f5e9; color: #2e7d32;">
@@ -96,16 +25,16 @@
                     </div>
                     <div>
                         <div class="stat-title">Total Sales</div>
-                        <div class="stat-value" style="font-size: 1.2rem;">${{ number_format($stats['totalSales'], 2) }}</div>
+                        <div class="stat-value" style="font-size: 1rem;">${{ number_format($stats['totalSales'], 2) }}</div>
                     </div>
                 </div>
                 <div class="stat-footer">
-                    <i class="bi bi-cart-check text-success me-1"></i> Revenue generated
+                    <i class="bi bi-cart-check text-success me-1"></i> Revenue
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-2 col-md-4">
             <div class="stat-card bg-white shadow-sm">
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <div class="stat-icon" style="background: #fce4ec; color: #c62828;">
@@ -113,16 +42,16 @@
                     </div>
                     <div>
                         <div class="stat-title">Total Expenses</div>
-                        <div class="stat-value" style="font-size: 1.2rem;">${{ number_format($stats['totalExpenses'], 2) }}</div>
+                        <div class="stat-value" style="font-size: 1rem;">${{ number_format($stats['totalExpenses'], 2) }}</div>
                     </div>
                 </div>
                 <div class="stat-footer">
-                    <i class="bi bi-arrow-down text-danger me-1"></i> Costs incurred
+                    <i class="bi bi-arrow-down text-danger me-1"></i> Costs
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-2 col-md-4">
             <div class="stat-card bg-white shadow-sm">
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <div class="stat-icon" style="background: #e8f5e9; color: #2e7d32;">
@@ -130,7 +59,7 @@
                     </div>
                     <div>
                         <div class="stat-title">Net Profit</div>
-                        <div class="stat-value" style="font-size: 1.2rem; {{ $stats['netProfit'] < 0 ? 'color: #dc3545;' : 'color: #198754;' }}">
+                        <div class="stat-value" style="font-size: 1rem; {{ $stats['netProfit'] < 0 ? 'color: #dc3545;' : 'color: #198754;' }}">
                             ${{ number_format($stats['netProfit'], 2) }}
                         </div>
                     </div>
@@ -145,15 +74,49 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-2 col-md-4">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="stat-icon" style="background: #fef2f2; color: #f46a6a;">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Customers</div>
+                        <div class="stat-value" style="font-size: 1rem;">{{ $stats['totalCustomers'] }}</div>
+                    </div>
+                </div>
+                <div class="stat-footer">
+                    <i class="bi bi-people text-success me-1"></i> Active
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="stat-icon" style="background: #f0fdf4; color: #34c38f;">
+                        <i class="bi bi-box-seam-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Products</div>
+                        <div class="stat-value" style="font-size: 1rem;">{{ $stats['totalProducts'] }}</div>
+                    </div>
+                </div>
+                <div class="stat-footer">
+                    <i class="bi bi-box text-success me-1"></i> Inventory
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4">
             <div class="stat-card bg-white shadow-sm">
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <div class="stat-icon" style="background: #fef2f2; color: #ef4444;">
                         <i class="bi bi-exclamation-triangle-fill"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Low Stock Products</div>
-                        <div class="stat-value">{{ $stats['lowStockProducts'] }}</div>
+                        <div class="stat-title">Low Stock</div>
+                        <div class="stat-value" style="font-size: 1rem;">{{ $stats['lowStockProducts'] }}</div>
                     </div>
                 </div>
                 <div class="stat-footer">
@@ -167,83 +130,130 @@
     <div class="row g-3 mb-4">
         <div class="col-xl-12">
             <div class="panel bg-white shadow-sm p-4">
-                <h6 class="fw-semibold mb-0" style="color: #1a1a2e;">Sales vs Expenses</h6>
-                <p class="text-muted mb-3" style="font-size: 0.8rem;">Monthly comparison for the last 6 months</p>
-                <canvas id="salesExpensesChart" height="100"></canvas>
+                <h6 class="fw-semibold mb-0" style="color: #1a1a2e;">Sales vs Expenses Comparison</h6>
+                <p class="text-muted mb-3" style="font-size: 0.8rem;">Monthly comparison — last 12 months</p>
+                <canvas id="comparisonChart" height="80"></canvas>
             </div>
         </div>
     </div>
 
-    {{-- Recent Activity --}}
-    <div class="row g-3">
+    <div class="row g-3 mb-4">
         <div class="col-xl-6">
             <div class="panel bg-white shadow-sm p-4">
+                <h6 class="fw-semibold mb-0" style="color: #1a1a2e;">Monthly Sales</h6>
+                <p class="text-muted mb-3" style="font-size: 0.8rem;">Last 12 months</p>
+                <canvas id="salesChart" height="100"></canvas>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="panel bg-white shadow-sm p-4">
+                <h6 class="fw-semibold mb-0" style="color: #1a1a2e;">Monthly Expenses</h6>
+                <p class="text-muted mb-3" style="font-size: 0.8rem;">Last 12 months</p>
+                <canvas id="expensesChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {{-- Tables Section --}}
+    <div class="row g-3 mb-4">
+        <div class="col-xl-4">
+            <div class="panel bg-white shadow-sm p-4">
                 <h6 class="fw-semibold mb-3" style="color: #1a1a2e;">
-                    <i class="bi bi-clock-history me-2"></i>Recent Users
+                    <i class="bi bi-cart-fill me-2"></i>Recent Orders
                 </h6>
-                @if ($recentUsers->count())
+                @if ($recentOrders->count())
                     <div class="table-responsive">
                         <table class="table table-borderless align-middle mb-0" style="font-size: 0.85rem;">
                             <thead style="color: #a4b0c2; font-size: 0.75rem;">
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Joined</th>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($recentUsers as $u)
+                                @foreach ($recentOrders as $o)
                                     <tr>
-                                        <td class="fw-medium" style="color: #1a1a2e;">{{ $u->name }}</td>
-                                        <td style="color: #5a6270;">{{ $u->email }}</td>
-                                        <td>
-                                            <span class="badge {{ $u->role === 'admin' ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
-                                                {{ ucfirst($u->role) }}
-                                            </span>
-                                        </td>
-                                        <td style="color: #a4b0c2;">{{ $u->created_at->diffForHumans() }}</td>
+                                        <td class="fw-medium" style="color: #1a1a2e;">#{{ $o->id }}</td>
+                                        <td style="color: #5a6270;">{{ $o->customer->name }}</td>
+                                        <td style="color: #1a1a2e;">${{ number_format($o->final_price, 2) }}</td>
+                                        <td style="color: #a4b0c2;">{{ $o->created_at->format('M d, Y') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 @else
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">No users yet.</p>
+                    <p class="text-muted mb-0" style="font-size: 0.85rem;">No orders yet.</p>
                 @endif
             </div>
         </div>
 
-        <div class="col-xl-6">
+        <div class="col-xl-4">
             <div class="panel bg-white shadow-sm p-4">
                 <h6 class="fw-semibold mb-3" style="color: #1a1a2e;">
-                    <i class="bi bi-person-lines-fill me-2"></i>Recent Customers
+                    <i class="bi bi-cash-stack me-2"></i>Recent Expenses
                 </h6>
-                @if ($recentCustomers->count())
+                @if ($recentExpenses->count())
                     <div class="table-responsive">
                         <table class="table table-borderless align-middle mb-0" style="font-size: 0.85rem;">
                             <thead style="color: #a4b0c2; font-size: 0.75rem;">
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                    <th>Added</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($recentCustomers as $c)
+                                @foreach ($recentExpenses as $e)
                                     <tr>
-                                        <td class="fw-medium" style="color: #1a1a2e;">{{ $c->name }}</td>
-                                        <td style="color: #5a6270;">{{ $c->phone }}</td>
-                                        <td style="color: #5a6270;">{{ $c->email ?? '—' }}</td>
-                                        <td style="color: #a4b0c2;">{{ $c->created_at->diffForHumans() }}</td>
+                                        <td>
+                                            <span class="badge bg-secondary rounded-pill">{{ $e->category }}</span>
+                                        </td>
+                                        <td style="color: #1a1a2e;">${{ number_format($e->amount, 2) }}</td>
+                                        <td style="color: #a4b0c2;">{{ \Carbon\Carbon::parse($e->date)->format('M d, Y') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 @else
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">No customers yet.</p>
+                    <p class="text-muted mb-0" style="font-size: 0.85rem;">No expenses yet.</p>
+                @endif
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="panel bg-white shadow-sm p-4">
+                <h6 class="fw-semibold mb-3" style="color: #1a1a2e;">
+                    <i class="bi bi-exclamation-triangle-fill me-2" style="color: #ef4444;"></i>Low Stock Products
+                </h6>
+                @if ($lowStockProductsList->count())
+                    <div class="table-responsive">
+                        <table class="table table-borderless align-middle mb-0" style="font-size: 0.85rem;">
+                            <thead style="color: #a4b0c2; font-size: 0.75rem;">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Stock</th>
+                                    <th>Alert</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($lowStockProductsList as $p)
+                                    <tr>
+                                        <td style="color: #1a1a2e;">{{ $p->name }}</td>
+                                        <td>
+                                            <span class="badge bg-danger rounded-pill">{{ $p->stock_quantity }}</span>
+                                        </td>
+                                        <td style="color: #a4b0c2;">{{ $p->low_stock_alert }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-muted mb-0" style="font-size: 0.85rem;">All products well stocked.</p>
                 @endif
             </div>
         </div>
@@ -254,16 +264,41 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('salesExpensesChart').getContext('2d');
+        const labels = @json($chartData['labels']);
+        const salesData = @json($chartData['sales']);
+        const expenseData = @json($chartData['expenses']);
 
-        new Chart(ctx, {
+        const sharedOptions = {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { boxWidth: 12, padding: 16, font: { size: 11 } },
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: function (v) { return '$' + v.toFixed(0); } },
+                    grid: { color: '#f1f3f5' },
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10 } },
+                },
+            },
+        };
+
+        // 1. Comparison Bar Chart
+        new Chart(document.getElementById('comparisonChart'), {
             type: 'bar',
             data: {
-                labels: @json($chartData['labels']),
+                labels: labels,
                 datasets: [
                     {
                         label: 'Sales',
-                        data: @json($chartData['sales']),
+                        data: salesData,
                         backgroundColor: 'rgba(52, 195, 143, 0.7)',
                         borderColor: '#34c38f',
                         borderWidth: 2,
@@ -271,7 +306,7 @@
                     },
                     {
                         label: 'Expenses',
-                        data: @json($chartData['expenses']),
+                        data: expenseData,
                         backgroundColor: 'rgba(244, 106, 106, 0.7)',
                         borderColor: '#f46a6a',
                         borderWidth: 2,
@@ -279,32 +314,47 @@
                     },
                 ],
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            boxWidth: 12,
-                            padding: 16,
-                            font: { size: 12 },
-                        },
-                    },
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function (value) { return '$' + value.toFixed(0); },
-                        },
-                        grid: { color: '#f1f3f5' },
-                    },
-                    x: {
-                        grid: { display: false },
-                    },
-                },
+            options: sharedOptions,
+        });
+
+        // 2. Monthly Sales Line Chart
+        new Chart(document.getElementById('salesChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sales',
+                    data: salesData,
+                    backgroundColor: 'rgba(52, 195, 143, 0.1)',
+                    borderColor: '#34c38f',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#34c38f',
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.35,
+                }],
             },
+            options: sharedOptions,
+        });
+
+        // 3. Monthly Expenses Line Chart
+        new Chart(document.getElementById('expensesChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Expenses',
+                    data: expenseData,
+                    backgroundColor: 'rgba(244, 106, 106, 0.1)',
+                    borderColor: '#f46a6a',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#f46a6a',
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.35,
+                }],
+            },
+            options: sharedOptions,
         });
     });
 </script>
