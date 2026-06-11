@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\SettingController;
 Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('dashboard');
@@ -45,5 +46,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/sales', [ReportsController::class, 'sales'])->name('sales');
         Route::get('/expenses', [ReportsController::class, 'expenses'])->name('expenses');
     });
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 });
 require __DIR__.'/auth.php';

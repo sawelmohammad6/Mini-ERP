@@ -1,7 +1,11 @@
 <div class="sidebar">
     <div class="brand">
-        <i class="bi bi-grid-3x3-gap-fill"></i>
-        <span>Mini ERP</span>
+        @if ($setting && $setting->logo)
+            <img src="{{ Storage::url($setting->logo) }}" alt="Logo" style="height: 32px; border-radius: 6px;">
+        @else
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+        @endif
+        <span>{{ $setting->business_name ?? 'Mini ERP' }}</span>
     </div>
 
     <div class="nav">
@@ -60,13 +64,13 @@
         </div>
 
         <div class="nav-item">
-            <a href="#" class="nav-link disabled">
+            <a href="{{ route('settings.index') }}" class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
                 <i class="bi bi-gear-fill"></i> Settings
             </a>
         </div>
     </div>
 
     <div class="sidebar-footer">
-        &copy; {{ date('Y') }} Mini ERP v1.0
+        &copy; {{ date('Y') }} {{ $setting->business_name ?? 'Mini ERP' }} v1.0
     </div>
 </div>
