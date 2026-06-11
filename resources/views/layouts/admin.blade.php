@@ -50,6 +50,10 @@
             font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;
             color: rgba(164,176,194,.5);
         }
+        .sidebar .nav-link-sub {
+            padding-left: 3rem !important;
+            font-size: 0.82rem !important;
+        }
         .sidebar-footer {
             padding: 1rem 1.5rem;
             border-top: 1px solid rgba(255,255,255,.06); font-size: 0.75rem;

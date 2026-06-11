@@ -44,8 +44,18 @@
         </div>
 
         <div class="nav-item">
-            <a href="#" class="nav-link disabled">
+            <span class="nav-link disabled" style="cursor: default;">
                 <i class="bi bi-file-earmark-bar-graph-fill"></i> Reports
+            </span>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('reports.sales') }}" class="nav-link nav-link-sub {{ request()->routeIs('reports.sales') ? 'active' : '' }}">
+                <i class="bi bi-graph-up-arrow"></i> Sales Report
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{{ route('reports.expenses') }}" class="nav-link nav-link-sub {{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
+                <i class="bi bi-cash-stack"></i> Expense Report
             </a>
         </div>
 
