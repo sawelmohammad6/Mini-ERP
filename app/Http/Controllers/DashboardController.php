@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\Expense;
+use App\Models\ActivityLog;
 
 class DashboardController extends Controller
 {
@@ -65,12 +66,18 @@ class DashboardController extends Controller
         $lowStockProductsList = Product::whereColumn('stock_quantity', '<=', 'low_stock_alert')
             ->get(['name', 'stock_quantity', 'low_stock_alert']);
 
+        $activities = ActivityLog::with('user')
+            ->latest()
+            ->take(7)
+            ->get();
+
         return view('dashboard', compact(
             'stats',
             'chartData',
             'recentOrders',
             'recentExpenses',
-            'lowStockProductsList'
+            'lowStockProductsList',
+            'activities'
         ));
     }
 }

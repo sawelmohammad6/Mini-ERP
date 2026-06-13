@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Mini ERP') }} @isset($title) — {{ $title }} @endisset</title>
+    <title>{{ $setting->business_name ?? config('app.name', 'Mini ERP') }} @isset($title) — {{ $title }} @endisset</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -15,7 +15,6 @@
         body { background: #f5f6fa; overflow-x: hidden; }
         .wrapper { display: flex; min-height: 100vh; }
 
-        /* ---- Sidebar ---- */
         .sidebar {
             width: 250px; min-width: 250px;
             background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
@@ -31,23 +30,23 @@
             display: flex; align-items: center; gap: 10px;
         }
         .sidebar .brand i { font-size: 1.5rem; color: #556ee6; }
-        .sidebar .nav { flex: 1; overflow-y: auto; padding: 1rem 0; }
-        .sidebar .nav-item { padding: 0 0.75rem; }
+        .sidebar .nav { flex: 1; overflow-y: auto; padding: 0.1rem 0; }
+        .sidebar .nav-item { padding: 0 0.75rem; margin-bottom: 0; }
         .sidebar .nav-link {
-            display: flex; align-items: center; gap: 12px;
-            padding: 0.65rem 1rem; margin-bottom: 2px;
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 16px; margin-bottom: 2px;
             color: #a4b0c2; text-decoration: none; font-size: 0.9rem;
             border-radius: 8px; transition: all 0.2s ease;
         }
-        .sidebar .nav-link i { font-size: 1.15rem; width: 20px; text-align: center; }
+        .sidebar .nav-link i { font-size: 1rem; width: 20px; text-align: center; }
         .sidebar .nav-link:hover { background: rgba(255,255,255,.06); color: #fff; }
         .sidebar .nav-link.active {
             background: #556ee6; color: #fff; font-weight: 500;
             box-shadow: 0 3px 12px rgba(85,110,230,.4);
         }
         .sidebar .nav-label {
-            padding: 0.75rem 1.5rem 0.25rem;
-            font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;
+            padding: 0.2rem 1.5rem 0.05rem;
+            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;
             color: rgba(164,176,194,.5);
         }
         .sidebar .nav-link-sub {
@@ -60,7 +59,6 @@
             color: rgba(164,176,194,.4);
         }
 
-        /* ---- Topbar ---- */
         .topbar {
             background: #fff; padding: 0 1.5rem; height: 64px;
             display: flex; align-items: center; justify-content: space-between;
@@ -107,19 +105,16 @@
         .topbar .user-info .name { font-size: 0.85rem; font-weight: 600; color: #1a1a2e; }
         .topbar .user-info .role { font-size: 0.7rem; color: #a4b0c2; }
 
-        /* ---- Main Content ---- */
         .main-content {
             flex: 1; display: flex; flex-direction: column; min-width: 0;
         }
         .page-content { flex: 1; padding: 1.5rem; }
 
-        /* ---- Hamburger (mobile) ---- */
         .hamburger {
             display: none; border: none; background: none; font-size: 1.5rem;
             color: #5a6270; cursor: pointer; padding: 4px;
         }
 
-        /* ---- Stats Cards ---- */
         .stat-card {
             border: none; border-radius: 14px; padding: 1.25rem 1.5rem;
             overflow: hidden; position: relative; height: 100%;
@@ -133,21 +128,32 @@
         .stat-card .stat-value { font-size: 1.75rem; font-weight: 700; color: #1a1a2e; }
         .stat-card .stat-footer { font-size: 0.75rem; color: #a4b0c2; }
 
-        /* ---- Chart placeholders ---- */
         .chart-placeholder {
             border: 2px dashed #dce0e8; border-radius: 14px;
             height: 260px; display: flex; align-items: center; justify-content: center;
             color: #a4b0c2; font-size: 0.9rem; background: #fafbfc;
         }
 
-        /* ---- Content panels ---- */
         .panel { border: none; border-radius: 14px; overflow: hidden; }
 
-        /* ---- Dark overlay for mobile ---- */
         .sidebar-overlay {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4);
             z-index: 1035;
         }
+
+        .activity-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid #f1f3f5;
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-badge {
+            width: 28px; height: 28px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 0.7rem;
+        }
+        .activity-badge.created { background: #e8f5e9; color: #2e7d32; }
+        .activity-badge.updated { background: #fff3e0; color: #e65100; }
+        .activity-badge.deleted { background: #fce4ec; color: #c62828; }
 
         @media (max-width: 991.98px) {
             .sidebar { position: fixed; left: -260px; height: 100%; z-index: 1045; transition: left 0.3s ease; }

@@ -17,13 +17,13 @@
         <div class="col-md-4">
             <div class="panel bg-white shadow-sm p-3">
                 <div class="text-muted" style="font-size: 0.8rem;">Total Sales</div>
-                <div class="fw-bold" style="font-size: 1.5rem; color: #34c38f;">${{ number_format($summary['totalSales'], 2) }}</div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #34c38f;">{{ format_currency($summary['totalSales']) }}</div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="panel bg-white shadow-sm p-3">
                 <div class="text-muted" style="font-size: 0.8rem;">Average Order Value</div>
-                <div class="fw-bold" style="font-size: 1.5rem; color: #556ee6;">${{ number_format($summary['avgOrderValue'], 2) }}</div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #556ee6;">{{ format_currency($summary['avgOrderValue']) }}</div>
             </div>
         </div>
     </div>
@@ -65,9 +65,9 @@
                         <tr>
                             <td class="fw-medium" style="color: #1a1a2e;">#{{ $order->id }}</td>
                             <td style="color: #5a6270;">{{ $order->customer->name }}</td>
-                            <td style="color: #5a6270;">${{ number_format($order->total, 2) }}</td>
-                            <td style="color: #5a6270;">${{ number_format($order->discount, 2) }}</td>
-                            <td style="color: #1a1a2e; font-weight: 600;">${{ number_format($order->final_price, 2) }}</td>
+                            <td style="color: #5a6270;">{{ format_currency($order->total) }}</td>
+                            <td style="color: #5a6270;">{{ format_currency($order->discount) }}</td>
+                            <td style="color: #1a1a2e; font-weight: 600;">{{ format_currency($order->final_price) }}</td>
                             <td style="color: #a4b0c2;">{{ $order->created_at->format('M d, Y') }}</td>
                         </tr>
                     @empty

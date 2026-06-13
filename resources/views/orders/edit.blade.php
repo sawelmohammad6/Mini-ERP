@@ -54,7 +54,7 @@
                             data-image="{{ $product->image ? Storage::url($product->image) : '' }}"
                             data-stock="{{ $product->stock_quantity }}"
                             {{ old('product_id', $order->items->first()->product_id ?? '') == $product->id ? 'selected' : '' }}>
-                            {{ $product->name }} — ${{ number_format($product->price, 2) }}
+                            {{ $product->name }} — {{ format_currency($product->price) }}
                         </option>
                     @endforeach
                 </select>
@@ -84,7 +84,7 @@
                             <div class="mb-3">
                                 <label for="price" class="form-label">Price</label>
                                 <input type="text" class="form-control" id="price" readonly
-                                    value="${{ number_format($item->price ?? 0, 2) }}">
+                                    value="{{ format_currency($item->price ?? 0) }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -107,7 +107,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="discount" class="form-label">Discount ($)</label>
+                        <label for="discount" class="form-label">Discount</label>
                         <input type="number" class="form-control @error('discount') is-invalid @enderror"
                             id="discount" name="discount" value="{{ old('discount', $order->discount) }}" min="0" step="0.01">
                         @error('discount')
@@ -118,7 +118,7 @@
                     <div class="mb-3">
                         <label for="subtotal" class="form-label">Subtotal</label>
                         <input type="text" class="form-control" id="subtotal" readonly
-                            value="${{ number_format(($item->price ?? 0) * ($item->quantity ?? 0), 2) }}">
+                            value="{{ format_currency(($item->price ?? 0) * ($item->quantity ?? 0)) }}">
                     </div>
                 </div>
             </div>
@@ -141,6 +141,7 @@
         const discountInput = document.getElementById('discount');
         const subtotalInput = document.getElementById('subtotal');
         const imagePreview = document.getElementById('productImagePreview');
+        const currencySymbol = '{{ currency_symbol() }}';
 
         function getSelected() {
             return productSelect.options[productSelect.selectedIndex];
@@ -176,13 +177,11 @@
             const qty = parseInt(qtyInput.value) || 0;
             const discount = parseFloat(discountInput.value) || 0;
 
-            priceInput.value = price ? '$' + price.toFixed(2) : '';
+            priceInput.value = price ? currencySymbol + price.toFixed(2) : '';
             stockDisplay.value = stock || '';
 
             const subtotal = price * qty;
-            subtotalInput.value = '$' + subtotal.toFixed(2);
-
-            updateImage();
+            subtotalInput.value = currencySymbol + subtotal.toFixed(2);
         }
 
         productSelect.addEventListener('change', recalc);

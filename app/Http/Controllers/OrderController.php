@@ -16,10 +16,17 @@ class OrderController extends Controller
         return view('orders.index', compact('orders'));
     }
 
+    public function show(Order $order)
+    {
+        $order->load(['customer', 'items.product']);
+
+        return view('orders.show', compact('order'));
+    }
+
     public function create()
     {
         $customers = Customer::orderBy('name')->get();
-        $products  = Product::orderBy('name')->get();
+        $products  = Product::where('is_active', true)->orderBy('name')->get();
 
         return view('orders.create', compact('customers', 'products'));
     }
@@ -71,7 +78,7 @@ class OrderController extends Controller
     {
         $order->load('items');
         $customers = Customer::orderBy('name')->get();
-        $products  = Product::orderBy('name')->get();
+        $products  = Product::where('is_active', true)->orderBy('name')->get();
 
         return view('orders.edit', compact('order', 'customers', 'products'));
     }
@@ -85,11 +92,19 @@ class OrderController extends Controller
             'discount'    => 'nullable|numeric|min:0',
         ]);
 
-        $product  = Product::findOrFail($validated['product_id']);
+        $product = Product::findOrFail($validated['product_id']);
         $discount = $validated['discount'] ?? 0;
         $subtotal = $product->price * $validated['quantity'];
         $total    = $subtotal;
         $finalPrice = $subtotal - $discount;
+
+        $oldItem = $order->items()->first();
+        if ($oldItem && $oldItem->product_id != $validated['product_id']) {
+            $oldProduct = Product::find($oldItem->product_id);
+            if ($oldProduct) {
+                $oldProduct->increment('stock_quantity', $oldItem->quantity);
+            }
+        }
 
         $order->update([
             'customer_id' => $validated['customer_id'],
@@ -106,6 +121,8 @@ class OrderController extends Controller
             'subtotal'   => $subtotal,
         ]);
 
+        $product->decrement('stock_quantity', $validated['quantity']);
+
         return redirect()
             ->route('orders.index')
             ->with('success', 'Order updated successfully.');
@@ -113,6 +130,13 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
+        foreach ($order->items as $item) {
+            $product = Product::find($item->product_id);
+            if ($product) {
+                $product->increment('stock_quantity', $item->quantity);
+            }
+        }
+
         $order->items()->delete();
         $order->delete();
 

@@ -11,13 +11,13 @@
         <div class="col-md-4">
             <div class="panel bg-white shadow-sm p-3">
                 <div class="text-muted" style="font-size: 0.8rem;">Total Expenses</div>
-                <div class="fw-bold" style="font-size: 1.5rem; color: #dc3545;">${{ number_format($summary['totalExpenses'], 2) }}</div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #dc3545;">{{ format_currency($summary['totalExpenses']) }}</div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="panel bg-white shadow-sm p-3">
                 <div class="text-muted" style="font-size: 0.8rem;">Highest Expense</div>
-                <div class="fw-bold" style="font-size: 1.5rem; color: #1a1a2e;">${{ number_format($summary['highestExpense'], 2) }}</div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #1a1a2e;">{{ format_currency($summary['highestExpense']) }}</div>
             </div>
         </div>
         <div class="col-md-4">
@@ -75,7 +75,7 @@
                             <td>
                                 <span class="badge bg-secondary rounded-pill">{{ $expense->category }}</span>
                             </td>
-                            <td class="fw-medium" style="color: #1a1a2e;">${{ number_format($expense->amount, 2) }}</td>
+                            <td class="fw-medium" style="color: #1a1a2e;">{{ format_currency($expense->amount) }}</td>
                             <td style="color: #5a6270;">{{ Str::limit($expense->note, 40) ?? '—' }}</td>
                             <td style="color: #a4b0c2;">{{ \Carbon\Carbon::parse($expense->date)->format('M d, Y') }}</td>
                         </tr>

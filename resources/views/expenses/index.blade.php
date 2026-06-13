@@ -18,7 +18,7 @@
             </div>
             <div>
                 <div class="text-muted" style="font-size: 0.8rem;">Total Expenses</div>
-                <div class="fw-bold" style="font-size: 1.5rem; color: #1a1a2e;">${{ number_format($totalExpenses, 2) }}</div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #1a1a2e;">{{ format_currency($totalExpenses) }}</div>
             </div>
         </div>
     </div>
@@ -66,7 +66,7 @@
                     @forelse ($expenses as $expense)
                         <tr>
                             <td>{{ $expense->id }}</td>
-                            <td class="fw-medium" style="color: #1a1a2e;">${{ number_format($expense->amount, 2) }}</td>
+                            <td class="fw-medium" style="color: #1a1a2e;">{{ format_currency($expense->amount) }}</td>
                             <td>
                                 <span class="badge bg-secondary rounded-pill">{{ $expense->category }}</span>
                             </td>

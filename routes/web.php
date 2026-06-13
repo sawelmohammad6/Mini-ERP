@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SettingController;
+
 Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('dashboard');
@@ -26,27 +27,26 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::get('/admin-test', function () {
-    return "Admin Panel Working";
-})->middleware(['auth', 'admin']);
 
-Route::middleware(['auth','admin'])->group(function () {
-
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('users', UserController::class)->except(['show', 'destroy']);
     Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
         ->name('users.toggleStatus');
 
-});
-Route::middleware(['auth'])->group(function () {
-    Route::resource('customers', CustomerController::class)->except(['show']);
-    Route::resource('products', ProductController::class)->except(['show']);
-    Route::resource('orders', OrderController::class)->except(['show']);
-    Route::resource('expenses', ExpenseController::class);
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/sales', [ReportsController::class, 'sales'])->name('sales');
         Route::get('/expenses', [ReportsController::class, 'expenses'])->name('expenses');
     });
+
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 });
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('customers', CustomerController::class)->except(['show']);
+    Route::resource('products', ProductController::class)->except(['show']);
+    Route::resource('orders', OrderController::class);
+    Route::resource('expenses', ExpenseController::class);
+});
+
 require __DIR__.'/auth.php';

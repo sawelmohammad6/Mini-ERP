@@ -42,16 +42,13 @@
                             </td>
                             <td>{{ $product->id }}</td>
                             <td class="fw-medium" style="color: #1a1a2e;">{{ $product->name }}</td>
-                            <td style="color: #5a6270;">${{ number_format($product->price, 2) }}</td>
+                            <td style="color: #5a6270;">{{ format_currency($product->price) }}</td>
                             <td>
-    {{ $product->stock_quantity }}
-
-    @if($product->stock_quantity <= $product->low_stock_alert)
-        <span class="badge bg-danger ms-1">
-            Low Stock
-        </span>
-    @endif
-</td>
+                                {{ $product->stock_quantity }}
+                                @if($product->stock_quantity <= $product->low_stock_alert)
+                                    <span class="badge bg-danger ms-1">Low Stock</span>
+                                @endif
+                            </td>
                             <td style="color: #5a6270;">{{ Str::limit($product->description, 50) ?? '—' }}</td>
                             <td>
                                 <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-primary">Edit</a>

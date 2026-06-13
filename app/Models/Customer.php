@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
 {
-   protected $fillable = [
-    'name',
-    'phone',
-    'email',
-    'address'
-];
-public function orders()
-{
-    return $this->hasMany(Order::class);
-}
+    use LogsActivity;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'address',
+    ];
 }

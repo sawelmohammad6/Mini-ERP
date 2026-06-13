@@ -25,7 +25,7 @@
                     </div>
                     <div>
                         <div class="stat-title">Total Sales</div>
-                        <div class="stat-value" style="font-size: 1rem;">${{ number_format($stats['totalSales'], 2) }}</div>
+                        <div class="stat-value" style="font-size: 1rem;">{{ format_currency($stats['totalSales']) }}</div>
                     </div>
                 </div>
                 <div class="stat-footer">
@@ -42,7 +42,7 @@
                     </div>
                     <div>
                         <div class="stat-title">Total Expenses</div>
-                        <div class="stat-value" style="font-size: 1rem;">${{ number_format($stats['totalExpenses'], 2) }}</div>
+                        <div class="stat-value" style="font-size: 1rem;">{{ format_currency($stats['totalExpenses']) }}</div>
                     </div>
                 </div>
                 <div class="stat-footer">
@@ -60,7 +60,7 @@
                     <div>
                         <div class="stat-title">Net Profit</div>
                         <div class="stat-value" style="font-size: 1rem; {{ $stats['netProfit'] < 0 ? 'color: #dc3545;' : 'color: #198754;' }}">
-                            ${{ number_format($stats['netProfit'], 2) }}
+                            {{ format_currency($stats['netProfit']) }}
                         </div>
                     </div>
                 </div>
@@ -177,7 +177,7 @@
                                     <tr>
                                         <td class="fw-medium" style="color: #1a1a2e;">#{{ $o->id }}</td>
                                         <td style="color: #5a6270;">{{ $o->customer->name }}</td>
-                                        <td style="color: #1a1a2e;">${{ number_format($o->final_price, 2) }}</td>
+                                        <td style="color: #1a1a2e;">{{ format_currency($o->final_price) }}</td>
                                         <td style="color: #a4b0c2;">{{ $o->created_at->format('M d, Y') }}</td>
                                     </tr>
                                 @endforeach
@@ -211,7 +211,7 @@
                                         <td>
                                             <span class="badge bg-secondary rounded-pill">{{ $e->category }}</span>
                                         </td>
-                                        <td style="color: #1a1a2e;">${{ number_format($e->amount, 2) }}</td>
+                                        <td style="color: #1a1a2e;">{{ format_currency($e->amount) }}</td>
                                         <td style="color: #a4b0c2;">{{ \Carbon\Carbon::parse($e->date)->format('M d, Y') }}</td>
                                     </tr>
                                 @endforeach
@@ -225,6 +225,41 @@
         </div>
 
         <div class="col-xl-4">
+            <div class="panel bg-white shadow-sm p-4">
+                <h6 class="fw-semibold mb-3" style="color: #1a1a2e;">
+                    <i class="bi bi-clock-history me-2" style="color: #556ee6;"></i>Recent Activities
+                </h6>
+                @if ($activities->count())
+                    @foreach ($activities as $activity)
+                        <div class="activity-item">
+                            <div class="activity-badge {{ $activity->action }}">
+                                @if ($activity->action === 'created')
+                                    <i class="bi bi-plus-lg"></i>
+                                @elseif ($activity->action === 'updated')
+                                    <i class="bi bi-pencil"></i>
+                                @elseif ($activity->action === 'deleted')
+                                    <i class="bi bi-trash3"></i>
+                                @endif
+                            </div>
+                            <div class="flex-grow-1" style="min-width: 0;">
+                                <div style="font-size: 0.8rem; color: #1a1a2e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ $activity->description }}
+                                </div>
+                                <div style="font-size: 0.65rem; color: #a4b0c2;">
+                                    {{ $activity->user->name ?? 'System' }} &middot; {{ $activity->created_at->diffForHumans() }}
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <p class="text-muted mb-0" style="font-size: 0.85rem;">No activities yet.</p>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-xl-12">
             <div class="panel bg-white shadow-sm p-4">
                 <h6 class="fw-semibold mb-3" style="color: #1a1a2e;">
                     <i class="bi bi-exclamation-triangle-fill me-2" style="color: #ef4444;"></i>Low Stock Products
@@ -267,6 +302,7 @@
         const labels = @json($chartData['labels']);
         const salesData = @json($chartData['sales']);
         const expenseData = @json($chartData['expenses']);
+        const currencySymbol = '{{ currency_symbol() }}';
 
         const sharedOptions = {
             responsive: true,
@@ -280,7 +316,7 @@
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { callback: function (v) { return '$' + v.toFixed(0); } },
+                    ticks: { callback: function (v) { return currencySymbol + v.toFixed(0); } },
                     grid: { color: '#f1f3f5' },
                 },
                 x: {
@@ -290,7 +326,6 @@
             },
         };
 
-        // 1. Comparison Bar Chart
         new Chart(document.getElementById('comparisonChart'), {
             type: 'bar',
             data: {
@@ -317,7 +352,6 @@
             options: sharedOptions,
         });
 
-        // 2. Monthly Sales Line Chart
         new Chart(document.getElementById('salesChart'), {
             type: 'line',
             data: {
@@ -337,7 +371,6 @@
             options: sharedOptions,
         });
 
-        // 3. Monthly Expenses Line Chart
         new Chart(document.getElementById('expensesChart'), {
             type: 'line',
             data: {

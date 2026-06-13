@@ -47,11 +47,12 @@
                                 </div>
                             </td>
                             <td style="color: #5a6270;">{{ $order->customer->name }}</td>
-                            <td style="color: #5a6270;">${{ number_format($order->total, 2) }}</td>
-                            <td style="color: #5a6270;">${{ number_format($order->discount, 2) }}</td>
-                            <td style="color: #1a1a2e; font-weight: 600;">${{ number_format($order->final_price, 2) }}</td>
+                            <td style="color: #5a6270;">{{ format_currency($order->total) }}</td>
+                            <td style="color: #5a6270;">{{ format_currency($order->discount) }}</td>
+                            <td style="color: #1a1a2e; font-weight: 600;">{{ format_currency($order->final_price) }}</td>
                             <td style="color: #a4b0c2;">{{ $order->created_at->format('M d, Y') }}</td>
                             <td>
+                                <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-info me-1 text-white">View</a>
                                 <a href="{{ route('orders.edit', $order) }}" class="btn btn-sm btn-warning me-1">Edit</a>
                                 <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline"
                                     onsubmit="return confirm('Delete order #{{ $order->id }}? This cannot be undone.');">
