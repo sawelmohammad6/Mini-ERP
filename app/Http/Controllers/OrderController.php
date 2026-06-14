@@ -2,16 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
+use App\Http\Requests\StoreOrderRequest;
+use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Models\Customer;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Services\OrderService;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        protected OrderService $orderService
+    ) {}
+
     public function index()
     {
-        $orders = Order::with(['customer', 'items.product'])->latest()->paginate(10);
+        $orders = Order::with(['customer', 'items.product'])
+            ->latest()
+            ->paginate(config('erp.pagination_size'));
 
         return view('orders.index', compact('orders'));
     }
@@ -26,48 +35,48 @@ class OrderController extends Controller
     public function create()
     {
         $customers = Customer::orderBy('name')->get();
-        $products  = Product::where('is_active', true)->orderBy('name')->get();
+        $products  = Product::with('orderItems')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
         return view('orders.create', compact('customers', 'products'));
     }
 
-    public function store(Request $request)
+    public function store(StoreOrderRequest $request)
     {
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'product_id'  => 'required|exists:products,id',
-            'quantity'    => 'required|integer|min:1',
-            'discount'    => 'nullable|numeric|min:0',
-        ]);
+        $validated = $request->validated();
 
         $product = Product::findOrFail($validated['product_id']);
 
-        if ($validated['quantity'] > $product->stock_quantity) {
+        if (!$this->orderService->validateStock($product, $validated['quantity'])) {
             return back()
                 ->withInput()
                 ->with('error', 'Not enough stock available.');
         }
 
-        $discount   = $validated['discount'] ?? 0;
-        $subtotal   = $product->price * $validated['quantity'];
-        $total      = $subtotal;
-        $finalPrice = $subtotal - $discount;
+        $totals = $this->orderService->calculateTotals(
+            $product->price,
+            $validated['quantity'],
+            $validated['discount'] ?? 0
+        );
 
-        $order = Order::create([
-            'customer_id' => $validated['customer_id'],
-            'total'       => $total,
-            'discount'    => $discount,
-            'final_price' => $finalPrice,
-        ]);
-
-        $order->items()->create([
-            'product_id' => $product->id,
-            'quantity'   => $validated['quantity'],
-            'price'      => $product->price,
-            'subtotal'   => $subtotal,
-        ]);
-
-        $product->decrement('stock_quantity', $validated['quantity']);
+        $this->orderService->createOrder(
+            [
+                'customer_id' => $validated['customer_id'],
+                'total'       => $totals['total'],
+                'discount'    => $validated['discount'] ?? 0,
+                'final_price' => $totals['final_price'],
+                'status'      => OrderStatus::Pending,
+            ],
+            [
+                'product_id' => $product->id,
+                'quantity'   => $validated['quantity'],
+                'price'      => $product->price,
+                'subtotal'   => $totals['subtotal'],
+            ],
+            $product
+        );
 
         return redirect()
             ->route('orders.index')
@@ -78,50 +87,48 @@ class OrderController extends Controller
     {
         $order->load('items');
         $customers = Customer::orderBy('name')->get();
-        $products  = Product::where('is_active', true)->orderBy('name')->get();
+        $products  = Product::with('orderItems')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
         return view('orders.edit', compact('order', 'customers', 'products'));
     }
 
-    public function update(Request $request, Order $order)
+    public function update(UpdateOrderRequest $request, Order $order)
     {
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'product_id'  => 'required|exists:products,id',
-            'quantity'    => 'required|integer|min:1',
-            'discount'    => 'nullable|numeric|min:0',
-        ]);
+        $validated = $request->validated();
 
         $product = Product::findOrFail($validated['product_id']);
-        $discount = $validated['discount'] ?? 0;
-        $subtotal = $product->price * $validated['quantity'];
-        $total    = $subtotal;
-        $finalPrice = $subtotal - $discount;
 
-        $oldItem = $order->items()->first();
-        if ($oldItem && $oldItem->product_id != $validated['product_id']) {
-            $oldProduct = Product::find($oldItem->product_id);
-            if ($oldProduct) {
-                $oldProduct->increment('stock_quantity', $oldItem->quantity);
-            }
+        if (!$this->orderService->validateStock($product, $validated['quantity'])) {
+            return back()
+                ->withInput()
+                ->with('error', 'Not enough stock available.');
         }
 
-        $order->update([
-            'customer_id' => $validated['customer_id'],
-            'total'       => $total,
-            'discount'    => $discount,
-            'final_price' => $finalPrice,
-        ]);
+        $totals = $this->orderService->calculateTotals(
+            $product->price,
+            $validated['quantity'],
+            $validated['discount'] ?? 0
+        );
 
-        $order->items()->delete();
-        $order->items()->create([
-            'product_id' => $product->id,
-            'quantity'   => $validated['quantity'],
-            'price'      => $product->price,
-            'subtotal'   => $subtotal,
-        ]);
-
-        $product->decrement('stock_quantity', $validated['quantity']);
+        $this->orderService->updateOrder(
+            $order,
+            [
+                'customer_id' => $validated['customer_id'],
+                'total'       => $totals['total'],
+                'discount'    => $validated['discount'] ?? 0,
+                'final_price' => $totals['final_price'],
+            ],
+            [
+                'product_id' => $product->id,
+                'quantity'   => $validated['quantity'],
+                'price'      => $product->price,
+                'subtotal'   => $totals['subtotal'],
+            ],
+            $product
+        );
 
         return redirect()
             ->route('orders.index')
@@ -130,15 +137,7 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
-        foreach ($order->items as $item) {
-            $product = Product::find($item->product_id);
-            if ($product) {
-                $product->increment('stock_quantity', $item->quantity);
-            }
-        }
-
-        $order->items()->delete();
-        $order->delete();
+        $this->orderService->deleteOrder($order);
 
         return redirect()
             ->route('orders.index')

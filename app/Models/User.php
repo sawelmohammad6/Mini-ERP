@@ -33,4 +33,12 @@ class User extends Authenticatable
             'is_active' => 'boolean',
         ];
     }
+
+    /**
+     * Shorthand check used by Blade directives and middleware.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === \App\Enums\UserRole::Admin->value;
+    }
 }

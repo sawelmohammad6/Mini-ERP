@@ -28,18 +28,22 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::resource('users', UserController::class)->except(['show', 'destroy']);
-    Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
-        ->name('users.toggleStatus');
-
+Route::middleware(['auth', 'can:view-reports'])->group(function () {
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/sales', [ReportsController::class, 'sales'])->name('sales');
         Route::get('/expenses', [ReportsController::class, 'expenses'])->name('expenses');
     });
+});
 
+Route::middleware(['auth', 'can:view-settings'])->group(function () {
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::resource('users', UserController::class)->except(['show', 'destroy']);
+    Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
+        ->name('users.toggleStatus');
 });
 
 Route::middleware(['auth'])->group(function () {

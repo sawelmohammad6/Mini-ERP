@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::latest()->paginate(10);
+        $products = Product::with('orderItems')
+            ->latest()
+            ->paginate(config('erp.pagination_size'));
 
         return view('products.index', compact('products'));
     }
@@ -20,16 +23,9 @@ class ProductController extends Controller
         return view('products.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        $validated = $request->validate([
-            'name'           => 'required|string|max:255',
-            'price'          => 'required|numeric|min:0',
-            'description'    => 'nullable|string',
-            'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'stock_quantity' => 'required|integer|min:0',
-            'low_stock_alert' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('products', 'public');
@@ -47,16 +43,9 @@ class ProductController extends Controller
         return view('products.edit', compact('product'));
     }
 
-    public function update(Request $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        $validated = $request->validate([
-            'name'           => 'required|string|max:255',
-            'price'          => 'required|numeric|min:0',
-            'description'    => 'nullable|string',
-            'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'stock_quantity' => 'required|integer|min:0',
-            'low_stock_alert' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('image')) {
             if ($product->image) {

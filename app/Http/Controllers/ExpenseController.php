@@ -2,59 +2,48 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseCategory;
+use App\Http\Requests\StoreExpenseRequest;
+use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
-use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $query = Expense::query();
 
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
+        if (request()->filled('category')) {
+            $query->where('category', request('category'));
         }
 
-        if ($request->filled('from_date')) {
-            $query->whereDate('date', '>=', $request->from_date);
+        if (request()->filled('from_date')) {
+            $query->whereDate('date', '>=', request('from_date'));
         }
 
-        if ($request->filled('to_date')) {
-            $query->whereDate('date', '<=', $request->to_date);
+        if (request()->filled('to_date')) {
+            $query->whereDate('date', '<=', request('to_date'));
         }
 
-        $expenses = $query->latest()->paginate(10);
+        $expenses = $query->latest()->paginate(config('erp.pagination_size'));
 
-        $totalExpenses = Expense::sum('amount');
-
-        $categories = [
-            'Fuel', 'Salary', 'Office Rent', 'Transport',
-            'Maintenance', 'Internet', 'Electricity', 'Other',
-        ];
-
-        return view('expenses.index', compact('expenses', 'totalExpenses', 'categories'));
+        return view('expenses.index', [
+            'expenses'      => $expenses,
+            'totalExpenses' => Expense::sum('amount'),
+            'categories'    => ExpenseCategory::values(),
+        ]);
     }
 
     public function create()
     {
-        $categories = [
-            'Fuel', 'Salary', 'Office Rent', 'Transport',
-            'Maintenance', 'Internet', 'Electricity', 'Other',
-        ];
-
-        return view('expenses.create', compact('categories'));
+        return view('expenses.create', [
+            'categories' => ExpenseCategory::values(),
+        ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreExpenseRequest $request)
     {
-        $validated = $request->validate([
-            'amount'   => 'required|numeric|min:0',
-            'category' => 'required|string',
-            'note'     => 'nullable|string',
-            'date'     => 'required|date',
-        ]);
-
-        Expense::create($validated);
+        Expense::create($request->validated());
 
         return redirect()
             ->route('expenses.index')
@@ -63,24 +52,15 @@ class ExpenseController extends Controller
 
     public function edit(Expense $expense)
     {
-        $categories = [
-            'Fuel', 'Salary', 'Office Rent', 'Transport',
-            'Maintenance', 'Internet', 'Electricity', 'Other',
-        ];
-
-        return view('expenses.edit', compact('expense', 'categories'));
+        return view('expenses.edit', [
+            'expense'    => $expense,
+            'categories' => ExpenseCategory::values(),
+        ]);
     }
 
-    public function update(Request $request, Expense $expense)
+    public function update(UpdateExpenseRequest $request, Expense $expense)
     {
-        $validated = $request->validate([
-            'amount'   => 'required|numeric|min:0',
-            'category' => 'required|string',
-            'note'     => 'nullable|string',
-            'date'     => 'required|date',
-        ]);
-
-        $expense->update($validated);
+        $expense->update($request->validated());
 
         return redirect()
             ->route('expenses.index')

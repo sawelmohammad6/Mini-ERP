@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Order;
@@ -13,9 +12,9 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalSales   = Order::sum('final_price');
+        $totalSales    = Order::sum('final_price');
         $totalExpenses = Expense::sum('amount');
-        $netProfit    = $totalSales - $totalExpenses;
+        $netProfit     = $totalSales - $totalExpenses;
 
         $stats = [
             'totalSales'       => $totalSales,
@@ -26,25 +25,21 @@ class DashboardController extends Controller
             'lowStockProducts' => Product::whereColumn('stock_quantity', '<=', 'low_stock_alert')->count(),
         ];
 
-        $months = [];
-        for ($i = 11; $i >= 0; $i--) {
-            $months[] = now()->subMonths($i)->format('Y-m');
-        }
-
-        $labels = [];
-        $salesData = [];
+        $chartMonths = config('erp.dashboard.chart_months');
+        $labels      = [];
+        $salesData   = [];
         $expenseData = [];
 
-        foreach ($months as $month) {
-            [$year, $monthNum] = explode('-', $month);
-            $labels[] = \Carbon\Carbon::createFromDate($year, $monthNum, 1)->format('M Y');
+        for ($i = $chartMonths - 1; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $labels[] = $month->format('M Y');
 
-            $salesData[] = Order::whereYear('created_at', $year)
-                ->whereMonth('created_at', $monthNum)
+            $salesData[] = Order::whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
                 ->sum('final_price');
 
-            $expenseData[] = Expense::whereYear('date', $year)
-                ->whereMonth('date', $monthNum)
+            $expenseData[] = Expense::whereYear('date', $month->year)
+                ->whereMonth('date', $month->month)
                 ->sum('amount');
         }
 
@@ -56,11 +51,11 @@ class DashboardController extends Controller
 
         $recentOrders = Order::with('customer')
             ->latest()
-            ->take(5)
+            ->take(config('erp.dashboard.recent_orders_count'))
             ->get();
 
         $recentExpenses = Expense::latest()
-            ->take(5)
+            ->take(config('erp.dashboard.recent_expenses_count'))
             ->get();
 
         $lowStockProductsList = Product::whereColumn('stock_quantity', '<=', 'low_stock_alert')
@@ -68,7 +63,7 @@ class DashboardController extends Controller
 
         $activities = ActivityLog::with('user')
             ->latest()
-            ->take(7)
+            ->take(config('erp.dashboard.activities_count'))
             ->get();
 
         return view('dashboard', compact(

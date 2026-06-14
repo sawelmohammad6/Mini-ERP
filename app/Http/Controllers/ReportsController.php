@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ExpenseCategory;
 use App\Models\Order;
 use App\Models\Expense;
 use Illuminate\Http\Request;
@@ -20,15 +21,18 @@ class ReportsController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $orders = $query->latest()->paginate(10);
+        $orders = $query->latest()->paginate(config('erp.pagination_size'));
 
-        $summary = [];
         $filteredQuery = clone $query;
-        $summary['totalOrders'] = $filteredQuery->count();
-        $summary['totalSales']  = $filteredQuery->sum('final_price');
-        $summary['avgOrderValue'] = $summary['totalOrders'] > 0
-            ? $summary['totalSales'] / $summary['totalOrders']
-            : 0;
+        $summary = [
+            'totalOrders'   => $filteredQuery->count(),
+            'totalSales'    => $filteredQuery->sum('final_price'),
+            'avgOrderValue' => 0,
+        ];
+
+        if ($summary['totalOrders'] > 0) {
+            $summary['avgOrderValue'] = $summary['totalSales'] / $summary['totalOrders'];
+        }
 
         return view('reports.sales', compact('orders', 'summary'));
     }
@@ -49,19 +53,19 @@ class ReportsController extends Controller
             $query->where('category', $request->category);
         }
 
-        $expenses = $query->latest()->paginate(10);
+        $expenses = $query->latest()->paginate(config('erp.pagination_size'));
 
-        $summary = [];
         $filteredQuery = clone $query;
-        $summary['totalExpenses'] = $filteredQuery->sum('amount');
-        $summary['highestExpense'] = $filteredQuery->max('amount') ?? 0;
-        $summary['expenseCount']   = $filteredQuery->count();
-
-        $categories = [
-            'Fuel', 'Salary', 'Office Rent', 'Transport',
-            'Maintenance', 'Internet', 'Electricity', 'Other',
+        $summary = [
+            'totalExpenses'  => $filteredQuery->sum('amount'),
+            'highestExpense' => $filteredQuery->max('amount') ?? 0,
+            'expenseCount'   => $filteredQuery->count(),
         ];
 
-        return view('reports.expenses', compact('expenses', 'summary', 'categories'));
+        return view('reports.expenses', [
+            'expenses'   => $expenses,
+            'summary'    => $summary,
+            'categories' => ExpenseCategory::values(),
+        ]);
     }
 }

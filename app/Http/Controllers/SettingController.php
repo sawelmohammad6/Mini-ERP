@@ -12,9 +12,10 @@ class SettingController extends Controller
     {
         $setting = Setting::first() ?? new Setting();
 
-        $currencies = ['BDT', 'USD', 'EUR', 'GBP', 'INR'];
-
-        return view('settings.index', compact('setting', 'currencies'));
+        return view('settings.index', [
+            'setting'    => $setting,
+            'currencies' => ['BDT', 'USD', 'EUR', 'GBP', 'INR'],
+        ]);
     }
 
     public function update(Request $request)

@@ -38,8 +38,11 @@
                 <label for="role" class="form-label">Role</label>
                 <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                     <option value="">-- Select Role --</option>
-                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>Staff</option>
+                    @foreach ($roles as $role)
+                        <option value="{{ $role }}" {{ old('role') === $role ? 'selected' : '' }}>
+                            {{ ucfirst($role) }}
+                        </option>
+                    @endforeach
                 </select>
                 @error('role')
                     <div class="invalid-feedback">{{ $message }}</div>
