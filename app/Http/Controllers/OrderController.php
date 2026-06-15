@@ -18,9 +18,19 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = Order::with(['customer', 'items.product'])
-            ->latest()
-            ->paginate(config('erp.pagination_size'));
+        $query = Order::with(['customer', 'items.product']);
+
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('id', $search)
+                  ->orWhereHas('customer', function ($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $orders = $query->latest()->paginate(config('erp.pagination_size'));
 
         return view('orders.index', compact('orders'));
     }

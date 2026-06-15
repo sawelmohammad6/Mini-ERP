@@ -11,11 +11,25 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('orderItems')
-            ->latest()
-            ->paginate(config('erp.pagination_size'));
+        $query = Product::with('orderItems');
 
-        return view('products.index', compact('products'));
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('price', 'like', "%{$search}%");
+            });
+        }
+
+        $products = $query->latest()->paginate(config('erp.pagination_size'));
+
+        $totalProducts = Product::count();
+        $lowStockCount = Product::whereColumn('stock_quantity', '<=', 'low_stock_alert')->count();
+        $outOfStockCount = Product::where('stock_quantity', 0)->count();
+
+        return view('products.index', compact(
+            'products', 'totalProducts', 'lowStockCount', 'outOfStockCount'
+        ));
     }
 
     public function create()

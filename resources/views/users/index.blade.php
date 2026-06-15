@@ -4,13 +4,6 @@
         <a href="{{ route('users.create') }}" class="btn btn-primary btn-sm">+ Create User</a>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     <div class="panel bg-white shadow-sm p-4">
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle mb-0">

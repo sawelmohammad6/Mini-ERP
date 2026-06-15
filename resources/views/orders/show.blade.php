@@ -1,12 +1,83 @@
 <x-app-layout>
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0" style="color: #1a1a2e;">Invoice — Order #{{ $order->id }}</h4>
-        <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
-            <i class="bi bi-printer me-1"></i>Print Invoice
-        </button>
+        <h4 class="fw-bold mb-0" style="color: #1a1a2e;">Order Details — #{{ $order->id }}</h4>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i>Print Invoice
+            </button>
+            <a href="{{ route('orders.edit', $order) }}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil me-1"></i>Edit
+            </a>
+        </div>
     </div>
 
     @php $item = $order->items->first(); @endphp
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon" style="background: #e8f5e9; color: #2e7d32;">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Final Price</div>
+                        <div class="stat-value" style="font-size: 1.3rem;">{{ format_currency($order->final_price) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon" style="background: #fef2f2; color: #f46a6a;">
+                        <i class="bi bi-tag-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Discount</div>
+                        <div class="stat-value" style="font-size: 1.3rem;">{{ format_currency($order->discount) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon" style="background: #f0fdf4; color: #34c38f;">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Status</div>
+                        <div>
+                            @php $status = $order->status->value ?? $order->status; @endphp
+                            @if ($status == 'completed' || $status == 'delivered')
+                                <span class="badge bg-success rounded-pill fs-6">{{ ucfirst($status) }}</span>
+                            @elseif ($status == 'pending')
+                                <span class="badge bg-warning text-dark rounded-pill fs-6">{{ ucfirst($status) }}</span>
+                            @elseif ($status == 'cancelled')
+                                <span class="badge bg-danger rounded-pill fs-6">{{ ucfirst($status) }}</span>
+                            @else
+                                <span class="badge bg-secondary rounded-pill fs-6">{{ ucfirst($status) }}</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon" style="background: #fefce8; color: #f1b44c;">
+                        <i class="bi bi-calendar-event-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Date</div>
+                        <div class="stat-value" style="font-size: 1rem; font-weight: 600;">{{ $order->created_at->format('M d, Y') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="panel bg-white shadow-sm p-4 mb-4" id="invoice">
         <div class="d-flex justify-content-between align-items-start mb-4">
@@ -86,12 +157,11 @@
 
     <div class="d-flex gap-2">
         <a href="{{ route('orders.index') }}" class="btn btn-secondary">Back to Orders</a>
-        <a href="{{ route('orders.edit', $order) }}" class="btn btn-outline-primary">Edit Order</a>
     </div>
 </x-app-layout>
 
 <style media="print">
-    .sidebar, .topbar, .btn, .d-flex.gap-2 { display: none !important; }
+    .sidebar, .topbar, .stat-card, .btn, .d-flex.gap-2 { display: none !important; }
     .panel { box-shadow: none !important; border: none !important; }
     body { background: #fff !important; }
     #invoice { padding: 0 !important; }

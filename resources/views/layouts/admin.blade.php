@@ -128,12 +128,6 @@
         .stat-card .stat-value { font-size: 1.75rem; font-weight: 700; color: #1a1a2e; }
         .stat-card .stat-footer { font-size: 0.75rem; color: #a4b0c2; }
 
-        .chart-placeholder {
-            border: 2px dashed #dce0e8; border-radius: 14px;
-            height: 260px; display: flex; align-items: center; justify-content: center;
-            color: #a4b0c2; font-size: 0.9rem; background: #fafbfc;
-        }
-
         .panel { border: none; border-radius: 14px; overflow: hidden; }
 
         .sidebar-overlay {
@@ -154,6 +148,42 @@
         .activity-badge.created { background: #e8f5e9; color: #2e7d32; }
         .activity-badge.updated { background: #fff3e0; color: #e65100; }
         .activity-badge.deleted { background: #fce4ec; color: #c62828; }
+
+        .welcome-card {
+            position: relative; border-radius: 16px; overflow: hidden;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 1.75rem 2rem;
+        }
+        .welcome-card .welcome-content {
+            position: relative; z-index: 1;
+            display: flex; align-items: center; justify-content: space-between;
+            color: #fff;
+        }
+        .welcome-card .welcome-sub { color: rgba(255,255,255,.6); font-size: 0.85rem; }
+        .welcome-card .welcome-badge {
+            background: rgba(255,255,255,.1); color: #fff;
+            padding: 6px 16px; border-radius: 20px; font-size: 0.8rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .table > :not(caption) > * > * {
+            padding: 0.7rem 0.75rem;
+            vertical-align: middle;
+        }
+        .table-hover > tbody > tr:hover {
+            background-color: rgba(85,110,230,.04);
+        }
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: rgba(0,0,0,.015);
+        }
+
+        .badge-soft-secondary {
+            background: #f1f3f5; color: #5a6270; font-weight: 500;
+        }
+
+        .toast-container {
+            position: fixed; top: 1rem; right: 1rem; z-index: 9999;
+        }
 
         @media (max-width: 991.98px) {
             .sidebar { position: fixed; left: -260px; height: 100%; z-index: 1045; transition: left 0.3s ease; }
@@ -184,11 +214,53 @@
     </div>
 </div>
 
+<div class="toast-container" id="toastContainer"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function toggleSidebar() {
         document.querySelector('.sidebar').classList.toggle('open');
         document.getElementById('sidebarOverlay').classList.toggle('open');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        @if (session('success'))
+            showToast(@json(session('success')), 'success');
+        @endif
+        @if (session('error'))
+            showToast(@json(session('error')), 'danger');
+        @endif
+        @if (session('warning'))
+            showToast(@json(session('warning')), 'warning');
+        @endif
+        @if (session('info'))
+            showToast(@json(session('info')), 'info');
+        @endif
+    });
+
+    function showToast(message, type) {
+        var container = document.getElementById('toastContainer');
+        var colors = {
+            success: { bg: '#198754', icon: 'bi-check-circle-fill' },
+            danger:  { bg: '#dc3545', icon: 'bi-exclamation-circle-fill' },
+            warning: { bg: '#f1b44c', icon: 'bi-exclamation-triangle-fill' },
+            info:    { bg: '#556ee6', icon: 'bi-info-circle-fill' },
+        };
+        var c = colors[type] || colors.info;
+        var html = '<div class="toast align-items-center text-white border-0 show" role="alert" style="background: ' + c.bg + '; border-radius: 10px;">' +
+            '<div class="d-flex">' +
+            '<div class="toast-body d-flex align-items-center gap-2" style="font-size: 0.9rem;">' +
+            '<i class="bi ' + c.icon + '"></i> ' + message +
+            '</div>' +
+            '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+            '</div>' +
+            '</div>';
+        container.insertAdjacentHTML('beforeend', html);
+        var el = container.lastElementChild;
+        setTimeout(function () {
+            el.classList.remove('show');
+            setTimeout(function () { el.remove(); }, 300);
+        }, 4000);
     }
 </script>
 @stack('scripts')

@@ -4,12 +4,19 @@
         <a href="{{ route('orders.create') }}" class="btn btn-primary btn-sm">+ New Order</a>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+    {{-- Search --}}
+    <div class="panel bg-white shadow-sm p-3 mb-4">
+        <form method="GET" action="{{ route('orders.index') }}" class="row g-2 align-items-end">
+            <div class="col-md-8">
+                <input type="text" class="form-control" name="search" placeholder="Search by order ID or customer name..."
+                    value="{{ request('search') }}">
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">Search</button>
+                <a href="{{ route('orders.index') }}" class="btn btn-outline-secondary flex-fill">Reset</a>
+            </div>
+        </form>
+    </div>
 
     <div class="panel bg-white shadow-sm p-4">
         <div class="table-responsive">
@@ -22,6 +29,7 @@
                         <th>Total</th>
                         <th>Discount</th>
                         <th>Final Price</th>
+                        <th>Status</th>
                         <th>Date</th>
                         <th>Actions</th>
                     </tr>
@@ -50,6 +58,18 @@
                             <td style="color: #5a6270;">{{ format_currency($order->total) }}</td>
                             <td style="color: #5a6270;">{{ format_currency($order->discount) }}</td>
                             <td style="color: #1a1a2e; font-weight: 600;">{{ format_currency($order->final_price) }}</td>
+                            <td>
+                                @php $status = $order->status->value ?? $order->status; @endphp
+                                @if ($status == 'completed' || $status == 'delivered')
+                                    <span class="badge bg-success rounded-pill">{{ ucfirst($status) }}</span>
+                                @elseif ($status == 'pending')
+                                    <span class="badge bg-warning text-dark rounded-pill">{{ ucfirst($status) }}</span>
+                                @elseif ($status == 'cancelled')
+                                    <span class="badge bg-danger rounded-pill">{{ ucfirst($status) }}</span>
+                                @else
+                                    <span class="badge bg-secondary rounded-pill">{{ ucfirst($status) }}</span>
+                                @endif
+                            </td>
                             <td style="color: #a4b0c2;">{{ $order->created_at->format('M d, Y') }}</td>
                             <td>
                                 <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-info me-1 text-white">View</a>
@@ -64,7 +84,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">No orders found.</td>
+                            <td colspan="9" class="text-center text-muted py-4">No orders found.</td>
                         </tr>
                     @endforelse
                 </tbody>

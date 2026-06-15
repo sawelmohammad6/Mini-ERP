@@ -3,13 +3,6 @@
         <h4 class="fw-bold mb-0" style="color: #1a1a2e;">Business Settings</h4>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     <div class="panel bg-white shadow-sm p-4">
         <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data">
             @csrf

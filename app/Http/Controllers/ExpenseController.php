@@ -25,12 +25,25 @@ class ExpenseController extends Controller
             $query->whereDate('date', '<=', request('to_date'));
         }
 
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where('note', 'like', "%{$search}%");
+        }
+
         $expenses = $query->latest()->paginate(config('erp.pagination_size'));
 
+        $totalExpenses = Expense::sum('amount');
+        $currentMonthExpenses = Expense::whereMonth('date', now()->month)
+            ->whereYear('date', now()->year)
+            ->sum('amount');
+        $expenseCount = Expense::count();
+
         return view('expenses.index', [
-            'expenses'      => $expenses,
-            'totalExpenses' => Expense::sum('amount'),
-            'categories'    => ExpenseCategory::values(),
+            'expenses'             => $expenses,
+            'totalExpenses'        => $totalExpenses,
+            'currentMonthExpenses' => $currentMonthExpenses,
+            'expenseCount'         => $expenseCount,
+            'categories'           => ExpenseCategory::values(),
         ]);
     }
 

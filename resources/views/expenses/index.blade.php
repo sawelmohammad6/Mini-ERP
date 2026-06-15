@@ -4,45 +4,71 @@
         <a href="{{ route('expenses.create') }}" class="btn btn-primary btn-sm">+ Add Expense</a>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    <div class="panel bg-white shadow-sm p-4 mb-4">
-        <div class="d-flex align-items-center gap-3">
-            <div class="stat-icon" style="background: #fefce8; color: #f1b44c; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                <i class="bi bi-cash-stack fs-5"></i>
+    {{-- Stat Cards --}}
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon" style="background: #fce4ec; color: #c62828;">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Expenses</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">{{ format_currency($totalExpenses) }}</div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <div class="text-muted" style="font-size: 0.8rem;">Total Expenses</div>
-                <div class="fw-bold" style="font-size: 1.5rem; color: #1a1a2e;">{{ format_currency($totalExpenses) }}</div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon" style="background: #fef2f2; color: #f46a6a;">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">This Month</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">{{ format_currency($currentMonthExpenses) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-white shadow-sm">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon" style="background: #f0fdf4; color: #34c38f;">
+                        <i class="bi bi-receipt-cutoff"></i>
+                    </div>
+                    <div>
+                        <div class="stat-title">Total Entries</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">{{ $expenseCount }}</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="panel bg-white shadow-sm p-4 mb-4">
-        <form method="GET" action="{{ route('expenses.index') }}" class="row g-3 align-items-end">
+    {{-- Filters --}}
+    <div class="panel bg-white shadow-sm p-3 mb-4">
+        <form method="GET" action="{{ route('expenses.index') }}" class="row g-2 align-items-end">
             <div class="col-md-3">
-                <label for="category" class="form-label" style="font-size: 0.85rem;">Category</label>
-                <select class="form-select" id="category" name="category">
+                <input type="text" class="form-control" name="search" placeholder="Search by note..."
+                    value="{{ request('search') }}">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="category">
                     <option value="">All Categories</option>
                     @foreach ($categories as $cat)
                         <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-3">
-                <label for="from_date" class="form-label" style="font-size: 0.85rem;">From Date</label>
-                <input type="date" class="form-control" id="from_date" name="from_date" value="{{ request('from_date') }}">
+            <div class="col-md-2">
+                <input type="date" class="form-control" name="from_date" value="{{ request('from_date') }}">
             </div>
-            <div class="col-md-3">
-                <label for="to_date" class="form-label" style="font-size: 0.85rem;">To Date</label>
-                <input type="date" class="form-control" id="to_date" name="to_date" value="{{ request('to_date') }}">
+            <div class="col-md-2">
+                <input type="date" class="form-control" name="to_date" value="{{ request('to_date') }}">
             </div>
-            <div class="col-md-3 d-flex gap-2">
+            <div class="col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary flex-fill">Filter</button>
                 <a href="{{ route('expenses.index') }}" class="btn btn-outline-secondary flex-fill">Reset</a>
             </div>
@@ -68,9 +94,11 @@
                             <td>{{ $expense->id }}</td>
                             <td class="fw-medium" style="color: #1a1a2e;">{{ format_currency($expense->amount) }}</td>
                             <td>
-                                <span class="badge bg-secondary rounded-pill">{{ $expense->category }}</span>
+                                <span class="badge badge-soft-secondary rounded-pill">{{ $expense->category }}</span>
                             </td>
-                            <td style="color: #5a6270;">{{ Str::limit($expense->note, 40) ?? '—' }}</td>
+                            <td style="color: #5a6270; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ $expense->note ?: '—' }}
+                            </td>
                             <td style="color: #5a6270;">{{ \Carbon\Carbon::parse($expense->date)->format('M d, Y') }}</td>
                             <td>
                                 <a href="{{ route('expenses.edit', $expense) }}" class="btn btn-sm btn-outline-primary me-1">Edit</a>

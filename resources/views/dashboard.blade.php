@@ -1,17 +1,20 @@
 <x-admin-layout>
     <x-slot name="title">Dashboard</x-slot>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bold mb-1" style="color: #1a1a2e;">Dashboard</h4>
-            <p class="mb-0" style="color: #a4b0c2; font-size: 0.875rem;">
-                Welcome back, {{ Auth::user()->name }}
-            </p>
-        </div>
-        <div>
-            <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
-                <i class="bi bi-calendar3 me-1"></i> {{ now()->format('M d, Y') }}
-            </span>
+    <div class="welcome-card mb-4">
+        <div class="welcome-bg"></div>
+        <div class="welcome-content">
+            <div>
+                <h4 class="fw-bold mb-1">Welcome back, {{ Auth::user()->name }}</h4>
+                <p class="mb-0 welcome-sub">
+                    {{ $setting->business_name ?? 'Mini ERP' }} &middot; {{ now()->format('l, F d, Y') }}
+                </p>
+            </div>
+            <div class="d-none d-sm-block">
+                <span class="welcome-badge">
+                    <i class="bi bi-calendar3 me-1"></i> {{ now()->format('M d, Y') }}
+                </span>
+            </div>
         </div>
     </div>
 
@@ -185,7 +188,7 @@
                         </table>
                     </div>
                 @else
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">No orders yet.</p>
+                    <x-empty-state icon="bi-cart" message="No orders yet." />
                 @endif
             </div>
         </div>
@@ -209,7 +212,7 @@
                                 @foreach ($recentExpenses as $e)
                                     <tr>
                                         <td>
-                                            <span class="badge bg-secondary rounded-pill">{{ $e->category }}</span>
+                                            <span class="badge badge-soft-secondary rounded-pill">{{ $e->category }}</span>
                                         </td>
                                         <td style="color: #1a1a2e;">{{ format_currency($e->amount) }}</td>
                                         <td style="color: #a4b0c2;">{{ \Carbon\Carbon::parse($e->date)->format('M d, Y') }}</td>
@@ -219,7 +222,7 @@
                         </table>
                     </div>
                 @else
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">No expenses yet.</p>
+                    <x-empty-state icon="bi-cash-stack" message="No expenses yet." />
                 @endif
             </div>
         </div>
@@ -252,7 +255,7 @@
                         </div>
                     @endforeach
                 @else
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">No activities yet.</p>
+                    <x-empty-state icon="bi-clock-history" message="No activities yet." />
                 @endif
             </div>
         </div>
@@ -288,7 +291,7 @@
                         </table>
                     </div>
                 @else
-                    <p class="text-muted mb-0" style="font-size: 0.85rem;">All products well stocked.</p>
+                    <x-empty-state icon="bi-check-circle" message="All products well stocked." />
                 @endif
             </div>
         </div>
