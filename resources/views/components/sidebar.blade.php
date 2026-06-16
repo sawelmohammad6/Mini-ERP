@@ -61,6 +61,11 @@
 
         <div class="nav-label">System</div>
         <div class="nav-item">
+            <a href="{{ route('activity-logs.index') }}" class="nav-link {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}">
+                <i class="bi bi-clock-history"></i> Activity Logs
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{{ route('settings.index') }}" class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
                 <i class="bi bi-gear-fill"></i> Settings
             </a>

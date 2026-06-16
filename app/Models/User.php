@@ -41,4 +41,9 @@ class User extends Authenticatable
     {
         return $this->role === \App\Enums\UserRole::Admin->value;
     }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
 }

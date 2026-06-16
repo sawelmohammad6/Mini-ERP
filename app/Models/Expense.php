@@ -23,4 +23,9 @@ class Expense extends Model
             'date' => 'date',
         ];
     }
+
+    public function getNameForLog(): string
+    {
+        return $this->note ?? 'Expense #' . $this->id;
+    }
 }

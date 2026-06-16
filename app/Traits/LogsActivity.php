@@ -14,7 +14,13 @@ trait LogsActivity
         });
 
         static::updated(function ($model) {
-            static::logActivity($model, 'updated');
+            if ($model->wasChanged('is_active') && $model->is_active) {
+                static::logActivity($model, 'activated');
+            } elseif ($model->wasChanged('is_active') && !$model->is_active) {
+                static::logActivity($model, 'deactivated');
+            } else {
+                static::logActivity($model, 'updated');
+            }
         });
 
         static::deleted(function ($model) {
@@ -31,22 +37,27 @@ trait LogsActivity
         $description = static::getActivityDescription($model, $action);
 
         ActivityLog::create([
-            'user_id'    => Auth::id(),
-            'action'     => $action,
-            'model_type' => get_class($model),
-            'model_id'   => $model->id ?? null,
+            'user_id'     => Auth::id(),
+            'action'      => $action,
+            'model_type'  => get_class($model),
+            'model_id'    => $model->id ?? null,
             'description' => $description,
         ]);
     }
 
     protected static function getActivityDescription($model, string $action): string
     {
+        $actor = Auth::user()->name ?? 'System';
+        $module = class_basename($model);
+
+        if ($model instanceof \App\Models\Order) {
+            return "{$actor} {$action} Order #{$model->id}";
+        }
+
         $name = method_exists($model, 'getNameForLog')
             ? $model->getNameForLog()
             : ($model->name ?? $model->id ?? 'Unknown');
 
-        $modelName = class_basename($model);
-
-        return ucfirst("{$action} {$modelName}: {$name}");
+        return "{$actor} {$action} {$module}: {$name}";
     }
 }
