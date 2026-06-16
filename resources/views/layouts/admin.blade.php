@@ -30,7 +30,7 @@
             display: flex; align-items: center; gap: 10px;
         }
         .sidebar .brand i { font-size: 1.5rem; color: #556ee6; }
-        .sidebar .nav { flex: 1; overflow-y: auto; padding: 0.1rem 0; }
+        .sidebar .nav { flex: 1; overflow-y: auto; padding: 0.1rem 0; display: block; }
         .sidebar .nav-item { padding: 0 0.75rem; margin-bottom: 0; }
         .sidebar .nav-link {
             display: flex; align-items: center; gap: 10px;
