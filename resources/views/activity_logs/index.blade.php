@@ -89,8 +89,10 @@
             </table>
         </div>
 
-        <div class="mt-3">
-            {{ $activities->links() }}
-        </div>
+        @if ($activities instanceof \Illuminate\Contracts\Pagination\Paginator)
+            <div class="mt-3">
+                {{ $activities->links() }}
+            </div>
+        @endif
     </div>
 </x-app-layout>
