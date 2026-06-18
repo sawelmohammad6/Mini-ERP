@@ -78,9 +78,11 @@
                 </tbody>
             </table>
         </div>
-        <div class="mt-3">
-            {{ $orders->links() }}
-        </div>
+        @if ($orders instanceof \Illuminate\Contracts\Pagination\Paginator)
+            <div class="mt-3">
+                {{ $orders->links() }}
+            </div>
+        @endif
     </div>
 </x-app-layout>
 
