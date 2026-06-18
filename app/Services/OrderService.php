@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Product;
 use App\Enums\OrderStatus;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * OrderService
@@ -19,6 +21,9 @@ use App\Enums\OrderStatus;
  * - Stock validation and deduction/restoration.
  * - Subtotal, total, discount, and final price calculations.
  * - Order item synchronization.
+ *
+ * Multi-step write operations use DB::transaction to ensure atomicity:
+ * if any step fails, all prior changes are rolled back.
  */
 class OrderService
 {
@@ -69,13 +74,15 @@ class OrderService
      */
     public function createOrder(array $orderData, array $itemData, Product $product): Order
     {
-        $order = Order::create($orderData);
+        return DB::transaction(function () use ($orderData, $itemData, $product) {
+            $order = Order::create($orderData);
 
-        $order->items()->create($itemData);
+            $order->items()->create($itemData);
 
-        $this->deductStock($product, $itemData['quantity']);
+            $this->deductStock($product, $itemData['quantity']);
 
-        return $order;
+            return $order;
+        });
     }
 
     /**
@@ -83,23 +90,25 @@ class OrderService
      */
     public function updateOrder(Order $order, array $orderData, array $itemData, Product $newProduct): Order
     {
-        $oldItem = $order->items()->first();
+        return DB::transaction(function () use ($order, $orderData, $itemData, $newProduct) {
+            $oldItem = $order->items()->first();
 
-        if ($oldItem && $oldItem->product_id !== $itemData['product_id']) {
-            $oldProduct = Product::find($oldItem->product_id);
-            if ($oldProduct) {
-                $this->restoreStock($oldProduct, $oldItem->quantity);
+            if ($oldItem && $oldItem->product_id !== $itemData['product_id']) {
+                $oldProduct = Product::find($oldItem->product_id);
+                if ($oldProduct) {
+                    $this->restoreStock($oldProduct, $oldItem->quantity);
+                }
             }
-        }
 
-        $order->update($orderData);
+            $order->update($orderData);
 
-        $order->items()->delete();
-        $order->items()->create($itemData);
+            $order->items()->delete();
+            $order->items()->create($itemData);
 
-        $this->deductStock($newProduct, $itemData['quantity']);
+            $this->deductStock($newProduct, $itemData['quantity']);
 
-        return $order;
+            return $order;
+        });
     }
 
     /**
@@ -107,14 +116,16 @@ class OrderService
      */
     public function deleteOrder(Order $order): void
     {
-        foreach ($order->items as $item) {
-            $product = Product::find($item->product_id);
-            if ($product) {
-                $this->restoreStock($product, $item->quantity);
+        DB::transaction(function () use ($order) {
+            foreach ($order->items as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $this->restoreStock($product, $item->quantity);
+                }
             }
-        }
 
-        $order->items()->delete();
-        $order->delete();
+            $order->items()->delete();
+            $order->delete();
+        });
     }
 }

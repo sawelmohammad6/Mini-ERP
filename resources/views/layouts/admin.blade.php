@@ -148,6 +148,8 @@
         .activity-badge.created { background: #e8f5e9; color: #2e7d32; }
         .activity-badge.updated { background: #fff3e0; color: #e65100; }
         .activity-badge.deleted { background: #fce4ec; color: #c62828; }
+        .activity-badge.activated { background: #e8f5e9; color: #2e7d32; }
+        .activity-badge.deactivated { background: #fce4ec; color: #c62828; }
 
         .welcome-card {
             position: relative; border-radius: 16px; overflow: hidden;

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
@@ -30,7 +32,20 @@ class CustomerController extends Controller
 
     public function store(StoreCustomerRequest $request)
     {
-        Customer::create($request->validated());
+        try {
+            Customer::create($request->validated());
+        } catch (\Exception $e) {
+            Log::error('Customer creation failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Something went wrong. Please try again.');
+        }
 
         return redirect()
             ->route('customers.index')
@@ -44,7 +59,20 @@ class CustomerController extends Controller
 
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        $customer->update($request->validated());
+        try {
+            $customer->update($request->validated());
+        } catch (\Exception $e) {
+            Log::error('Customer update failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Something went wrong. Please try again.');
+        }
 
         return redirect()
             ->route('customers.index')
@@ -53,7 +81,18 @@ class CustomerController extends Controller
 
     public function destroy(Customer $customer)
     {
-        $customer->delete();
+        try {
+            $customer->delete();
+        } catch (\Exception $e) {
+            Log::error('Customer deletion failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Something went wrong. Please try again.');
+        }
 
         return redirect()
             ->route('customers.index')

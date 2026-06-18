@@ -6,6 +6,8 @@ use App\Enums\ExpenseCategory;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ExpenseController extends Controller
 {
@@ -56,7 +58,20 @@ class ExpenseController extends Controller
 
     public function store(StoreExpenseRequest $request)
     {
-        Expense::create($request->validated());
+        try {
+            Expense::create($request->validated());
+        } catch (\Exception $e) {
+            Log::error('Expense creation failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Something went wrong. Please try again.');
+        }
 
         return redirect()
             ->route('expenses.index')
@@ -73,7 +88,20 @@ class ExpenseController extends Controller
 
     public function update(UpdateExpenseRequest $request, Expense $expense)
     {
-        $expense->update($request->validated());
+        try {
+            $expense->update($request->validated());
+        } catch (\Exception $e) {
+            Log::error('Expense update failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Something went wrong. Please try again.');
+        }
 
         return redirect()
             ->route('expenses.index')
@@ -82,7 +110,18 @@ class ExpenseController extends Controller
 
     public function destroy(Expense $expense)
     {
-        $expense->delete();
+        try {
+            $expense->delete();
+        } catch (\Exception $e) {
+            Log::error('Expense deletion failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Something went wrong. Please try again.');
+        }
 
         return redirect()
             ->route('expenses.index')

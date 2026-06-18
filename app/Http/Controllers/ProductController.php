@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -39,13 +41,30 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        $validated = $request->validated();
+        try {
+            $validated = $request->validated();
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('products', 'public');
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('products', 'public');
+                if ($path === false) {
+                    throw new \RuntimeException('File upload failed.');
+                }
+                $validated['image'] = $path;
+            }
+
+            Product::create($validated);
+        } catch (\Exception $e) {
+            Log::error('Product creation failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Something went wrong. Please try again.');
         }
-
-        Product::create($validated);
 
         return redirect()
             ->route('products.index')
@@ -59,16 +78,33 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $validated = $request->validated();
+        try {
+            $validated = $request->validated();
 
-        if ($request->hasFile('image')) {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
+            if ($request->hasFile('image')) {
+                if ($product->image) {
+                    Storage::disk('public')->delete($product->image);
+                }
+                $path = $request->file('image')->store('products', 'public');
+                if ($path === false) {
+                    throw new \RuntimeException('File upload failed.');
+                }
+                $validated['image'] = $path;
             }
-            $validated['image'] = $request->file('image')->store('products', 'public');
-        }
 
-        $product->update($validated);
+            $product->update($validated);
+        } catch (\Exception $e) {
+            Log::error('Product update failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Something went wrong. Please try again.');
+        }
 
         return redirect()
             ->route('products.index')
@@ -77,11 +113,22 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
+        try {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
 
-        $product->delete();
+            $product->delete();
+        } catch (\Exception $e) {
+            Log::error('Product deletion failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Something went wrong. Please try again.');
+        }
 
         return redirect()
             ->route('products.index')

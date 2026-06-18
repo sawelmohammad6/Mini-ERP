@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ActivityLogController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -51,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('products', ProductController::class)->except(['show']);
     Route::resource('orders', OrderController::class);
     Route::resource('expenses', ExpenseController::class);
+    Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
 });
 
 require __DIR__.'/auth.php';

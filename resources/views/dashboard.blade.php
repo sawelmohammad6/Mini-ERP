@@ -242,6 +242,12 @@
                                     <i class="bi bi-pencil"></i>
                                 @elseif ($activity->action === 'deleted')
                                     <i class="bi bi-trash3"></i>
+                                @elseif ($activity->action === 'activated')
+                                    <i class="bi bi-toggle-on"></i>
+                                @elseif ($activity->action === 'deactivated')
+                                    <i class="bi bi-toggle-off"></i>
+                                @else
+                                    <i class="bi bi-arrow-repeat"></i>
                                 @endif
                             </div>
                             <div class="flex-grow-1" style="min-width: 0;">
